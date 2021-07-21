@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class UserapiConfig(AppConfig):
+class ActivityConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'userapi'
+    name = 'activity'
