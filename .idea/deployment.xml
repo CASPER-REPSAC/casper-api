@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" serverName="casper_api" remoteFilesAllowedToDisappearOnAutoupload="false">
+    <serverData>
+      <paths name="casper_api">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/ubuntu/casper_api" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="casper_api (project level)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/ubuntu/casper_api" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+  </component>
+</project>

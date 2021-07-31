@@ -12,30 +12,28 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 
-#for key
+# for key
 import json
 
-#JWT Configuration
+# JWT Configuration
 REST_USE_JWT = True
 
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME' : timedelta(hours=2),
-    'REFRESH_TOKEN_LIFETIME' : timedelta(days=7),
-    'ROTATE_REFRESH_TOKENS' : False,
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
 }
 
-#json parse for key
-with open ('connects/keys.json','r') as key_file:
+# json parse for key
+with open('connects/keys.json') as key_file:
     json_file = json.load(key_file)
-    json_secret_key = json_file("settings-secret-key")
-
+    json_secret_key = json_file["settings-secret-key"]
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -48,7 +46,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -58,38 +55,44 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    #django-rest framework
+    'django.contrib.sites',
+    
+    # django-rest framework
     'rest_framework',
-    'rest_framework_simplejwt.token_blacklist',
-    #dj-rest-auth
-    'dj-rest-auth',
-    'dj-rest-auth.registration',
-    #djang-allauth
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
+    #'rest_framework_simplejwt.token_blacklist',
 
-    #restapi for study info : apps.py
-    'restapi.apps.RestapiConfig',
-    #restapi for google auth : apps.py
-    'userapi.apps.UserapiConfig',   
-   
-    #api doc module
-    #'drf-yasg',
+    # dj-rest-auth
+    #'dj-rest-auth',
+    #'dj-rest-auth.registration',
+
+    # djang-allauth
+    #'allauth',
+    #'allauth.account',
+    #'allauth.socialaccount',
+    #'allauth.socialaccount.providers.google',
+
+    # restapi for study info : apps.py
+    #'restapi.apps.RestapiConfig',
+    # restapi for google auth : apps.py
+    #'userapi.apps.UserapiConfig',
+
+    # api doc module
+    # 'drf-yasg',
+
+    'connects',
+    'activity',
 ]
 
-#SITE_ID = 
-AUTH_USER_MODEL = 'userapi.User'
+# SITE_ID =
+#AUTH_USER_MODEL = 'userapi.User'
 
 REST_FRAMEWORK = {
-  'DEFAULT_PERMISSION_CLASSES' :(
-      'rest_framework.permissions.IsAuthenticated',
-  ),
-  'DEFAULT_AUTHENTICATION_CLASSES' :(
-    'rest_framework.authentication.SessionAuthentication',
-    'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
     ),
 }
 
@@ -128,21 +131,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'connects.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'apidb',        #db name    / default_set : BASE_DIR / 'db.sqlite3',
-        'USER':'apiuser',          #db id
-        'PASSWORD' : 'apipw',        #db pw
-        'HOST' : 'localhost',   #host ip
-        'PORT' : '3306',        #port
+        'NAME': 'apidb',  # db name    / default_set : BASE_DIR / 'db.sqlite3',
+        'USER': 'apiuser',  # db id
+        'PASSWORD': 'apipw',  # db pw
+        'HOST': 'localhost',  # host ip
+        'PORT': '3306',  # port
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -162,7 +163,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
@@ -175,7 +175,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/

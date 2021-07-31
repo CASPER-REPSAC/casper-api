@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="f85891c2-ad74-429c-a48e-c454010ad7ee" name="casper_api (project level)" url="">
+        <fileTransfer rootFolder="/home/ubuntu/casper_api" accessType="SFTP" host="52.78.78.26" port="22" sshConfigId="243a26f9-f28b-4a1d-b2d2-ffef0b5c0970" sshConfig="casper_api" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
