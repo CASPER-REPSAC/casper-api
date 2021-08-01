@@ -25,28 +25,28 @@ def activityList(request):
             return JsonResponse(serializer.data, status=201)
         return JsonResponse(serializer.errors, status=400)
 
-    @csrf_exempt
-    def activityDetail(request, pk):
-        """
-        Retrieve, update or delete a code snippet.
-        """
-        try:
-            activity = Activity.objects.get(pk=pk)
-        except Activity.DoesNotExist:
-            return HttpResponse(status=404)
+@csrf_exempt
+def activityDetail(request, pk):
+    """
+    Retrieve, update or delete a code snippet.
+    """
+    try:
+        activity = Activity.objects.get(pk=pk)
+    except Activity.DoesNotExist:
+        return HttpResponse(status=404)
 
-        if request.method == 'GET':
-            serializer = ActivitySerializer(activity)
+    if request.method == 'GET':
+        serializer = ActivitySerializer(activity)
+        return JsonResponse(serializer.data)
+
+    elif request.method == 'PUT':
+        data = JSONParser().parse(request)
+        serializer = ActivitySerializer(activity, data=data)
+        if serializer.is_valid():
+            serializer.save()
             return JsonResponse(serializer.data)
+        return JsonResponse(serializer.errors, status=400)
 
-        elif request.method == 'PUT':
-            data = JSONParser().parse(request)
-            serializer = ActivitySerializer(activity, data=data)
-            if serializer.is_valid():
-                serializer.save()
-                return JsonResponse(serializer.data)
-            return JsonResponse(serializer.errors, status=400)
-
-        elif request.method == 'DELETE':
-            activity.delete()
-            return HttpResponse(status=204)
+    elif request.method == 'DELETE':
+        activity.delete()
+        return HttpResponse(status=204)
