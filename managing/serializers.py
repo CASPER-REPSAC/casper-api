@@ -1,9 +1,5 @@
 from rest_framework import serializers
-from .models import Activity
-from .models import Chapter
-from .models import Chapterarticle
-from .models import Chaptercomment
-from .models import Chapterfile
+from .models import Activity, Chapter, Chapterarticle, Chaptercomment, Chapterfile
 
 class ActivitySerializer():
     class Meta:
