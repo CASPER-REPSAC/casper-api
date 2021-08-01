@@ -30,7 +30,7 @@ SIMPLE_JWT = {
 #json parse for key
 with open ('connects/keys.json','r') as key_file:
     json_file = json.load(key_file)
-    json_secret_key = json_file("settings-secret-key")
+    json_secret_key = json_file["settings-secret-key"]
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -46,7 +46,7 @@ SECRET_KEY = json_secret_key
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -59,29 +59,32 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    #Feature : Managing
+    'managing.apps.ManagingConfig',
     #django-rest framework
     'rest_framework',
-    'rest_framework_simplejwt.token_blacklist',
-    #dj-rest-auth
-    'dj-rest-auth',
-    'dj-rest-auth.registration',
-    #djang-allauth
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
 
-    #restapi for study info : apps.py
-    'restapi.apps.RestapiConfig',
-    #restapi for google auth : apps.py
-    'userapi.apps.UserapiConfig',   
+
+
+
+
+    #'rest_framework_simplejwt.token_blacklist',
+    #dj-rest-auth
+    #'dj-rest-auth',
+    #'dj-rest-auth.registration',
+
+    #djang-allauth
+    #'allauth',
+    #'allauth.account',
+    #'allauth.socialaccount',
+    #'allauth.socialaccount.providers.google',
    
     #api doc module
     #'drf-yasg',
 ]
 
 #SITE_ID = 
-AUTH_USER_MODEL = 'userapi.User'
+#AUTH_USER_MODEL = 'userapi.User'
 
 REST_FRAMEWORK = {
   'DEFAULT_PERMISSION_CLASSES' :(
@@ -135,7 +138,7 @@ WSGI_APPLICATION = 'connects.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'apidb',        #db name    / default_set : BASE_DIR / 'db.sqlite3',
+        'NAME': 'managedb',        #db name    / default_set : BASE_DIR / 'db.sqlite3',
         'USER':'apiuser',          #db id
         'PASSWORD' : 'apipw',        #db pw
         'HOST' : 'localhost',   #host ip
