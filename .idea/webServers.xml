@@ -9,6 +9,13 @@
           </advancedOptions>
         </fileTransfer>
       </webServer>
+      <webServer id="2f3fff5d-075f-487d-97ba-799deba5ca1b" name="DRF_Tutorial">
+        <fileTransfer rootFolder="/home/ubuntu/tutorial" accessType="SFTP" host="52.78.78.26" port="22" sshConfigId="243a26f9-f28b-4a1d-b2d2-ffef0b5c0970" sshConfig="casper_api" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
     </option>
   </component>
 </project>

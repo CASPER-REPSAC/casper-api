@@ -8,6 +8,22 @@
 from django.db import models
 
 
+class Activity(models.Model):
+    title = models.CharField(max_length=50)
+    type = models.CharField(max_length=50)
+    author = models.CharField(max_length=50)
+    createDate = models.DateField(db_column='createDate')  # Field name made lowercase.
+    introduce = models.CharField(max_length=65)
+    startDate = models.DateField(db_column='startDate')  # Field name made lowercase.
+    endDate = models.DateField(db_column='endDate')  # Field name made lowercase.
+    currentState = models.PositiveIntegerField(db_column='currentState', default=0)  # Field name made lowercase.
+    viewerNum = models.PositiveIntegerField(db_column='viewerNum', default=0)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'activity'
+
+
 class AuthGroup(models.Model):
     name = models.CharField(unique=True, max_length=150)
 
@@ -122,16 +138,10 @@ class DjangoSession(models.Model):
         db_table = 'django_session'
 
 
-class UserData(models.Model):
-    primary_key = models.AutoField(primary_key=True)
-    id = models.CharField(max_length=50)
-    password = models.CharField(max_length=30)
-    name = models.CharField(max_length=20)
-    nickname = models.CharField(max_length=20)
-    level = models.CharField(max_length=10)
-    description = models.TextField(blank=True, null=True)
-    created_date = models.DateTimeField()
+class DjangoSite(models.Model):
+    domain = models.CharField(unique=True, max_length=100)
+    name = models.CharField(max_length=50)
 
     class Meta:
         managed = False
-        db_table = 'user_data'
+        db_table = 'django_site'

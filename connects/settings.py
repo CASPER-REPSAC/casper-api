@@ -16,16 +16,16 @@ from pathlib import Path
 import json
 
 # JWT Configuration
-REST_USE_JWT = True
+# REST_USE_JWT = True
 
 from datetime import timedelta
 
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'ROTATE_REFRESH_TOKENS': False,
-    'BLACKLIST_AFTER_ROTATION': True,
-}
+# SIMPLE_JWT = {
+#     'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),
+#     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+#     'ROTATE_REFRESH_TOKENS': False,
+#     'BLACKLIST_AFTER_ROTATION': True,
+# }
 
 # json parse for key
 with open('connects/keys.json') as key_file:
@@ -44,7 +44,7 @@ SECRET_KEY = json_secret_key
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -66,10 +66,10 @@ INSTALLED_APPS = [
     #'dj-rest-auth.registration',
 
     # djang-allauth
-    #'allauth',
-    #'allauth.account',
-    #'allauth.socialaccount',
-    #'allauth.socialaccount.providers.google',
+    # 'allauth',
+    # 'allauth.account',
+    # 'allauth.socialaccount',
+    # 'allauth.socialaccount.providers.google',
 
     # restapi for study info : apps.py
     #'restapi.apps.RestapiConfig',
@@ -79,7 +79,8 @@ INSTALLED_APPS = [
     # api doc module
     # 'drf-yasg',
 
-    'connects',
+    # apps
+    'managing',
     'activity',
 ]
 
@@ -96,10 +97,10 @@ REST_FRAMEWORK = {
     ),
 }
 
-USERAPI_USER_MODEL_USERNAME_FIELD = None
-USERAPI_USER_EMAIL_REQUIRED = True
-USERAPI_USERNAME_REQUIRED = False
-USERAPI_AUTHENTICATION_METHOD = 'email'
+# USERAPI_USER_MODEL_USERNAME_FIELD = None
+# USERAPI_USER_EMAIL_REQUIRED = True
+# USERAPI_USERNAME_REQUIRED = False
+# USERAPI_AUTHENTICATION_METHOD = 'email'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -168,7 +169,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 

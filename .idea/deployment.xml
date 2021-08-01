@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" serverName="casper_api" remoteFilesAllowedToDisappearOnAutoupload="false">
+  <component name="PublishConfigData" serverName="Connect" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
-      <paths name="casper_api">
+      <paths name="Connect">
         <serverdata>
           <mappings>
             <mapping deploy="/home/ubuntu/casper_api" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="DRF_Tutorial">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
