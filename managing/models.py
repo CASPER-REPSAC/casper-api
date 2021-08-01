@@ -8,8 +8,6 @@
 from django.db import models
 
 
-
-#Activity Models for test
 class Activity(models.Model):
     activityname = models.CharField(db_column='activityName', max_length=16)  # Field name made lowercase.
     activitytype = models.IntegerField(db_column='activityType')  # Field name made lowercase.
@@ -19,17 +17,17 @@ class Activity(models.Model):
         managed = False
         db_table = 'activity'
 
-#Chapter in Activity
 class Chapter(models.Model):
     activityid = models.ForeignKey(Activity, models.DO_NOTHING, db_column='activityID')  # Field name made lowercase.
     chapterid = models.CharField(db_column='chapterID', primary_key=True, max_length=8)  # Field name made lowercase.
     chaptercreated = models.DateTimeField(db_column='chapterCreated')  # Field name made lowercase.
+    chaptersubject = models.CharField(max_length=32)
 
     class Meta:
         managed = False
         db_table = 'chapter'
 
-#Article in Chapter
+
 class Chapterarticle(models.Model):
     activityid = models.CharField(db_column='activityID', max_length=8)  # Field name made lowercase.
     chapterid = models.ForeignKey(Chapter, models.DO_NOTHING, db_column='chapterID')  # Field name made lowercase.
@@ -39,7 +37,7 @@ class Chapterarticle(models.Model):
         managed = False
         db_table = 'chapterArticle'
 
-#Comment in Chapter
+
 class Chaptercomment(models.Model):
     activityid = models.CharField(db_column='activityID', max_length=8)  # Field name made lowercase.
     chapterid = models.ForeignKey(Chapter, models.DO_NOTHING, db_column='chapterID')  # Field name made lowercase.
@@ -50,7 +48,7 @@ class Chaptercomment(models.Model):
         managed = False
         db_table = 'chapterComment'
 
-#Files in Chapter
+
 class Chapterfile(models.Model):
     activityid = models.CharField(db_column='activityID', max_length=8)  # Field name made lowercase.
     chapterid = models.ForeignKey(Chapter, models.DO_NOTHING, db_column='chapterID')  # Field name made lowercase.
