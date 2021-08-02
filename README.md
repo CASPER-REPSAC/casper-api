@@ -1,8 +1,8 @@
 # django-rest-api
 
->>환경 : Python 3.6.9 이상, django 3.2.5 이상  
+>>환경 : Python 3.9.6, django 3.2.5  
 >>Database : Mysql  
 >>필요 모듈 : djangorestframework, mysqlclient  
 
-
->> 현재 무지성 박치기 중 ..
+---------------------------------------
+DRF Tutorial 따라하는 중... (3/6) 완료
