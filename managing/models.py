@@ -13,6 +13,9 @@ class Activity(models.Model):
     activitytype = models.IntegerField(db_column='activityType')  # Field name made lowercase.
     activityid = models.CharField(db_column='activityID', primary_key=True, max_length=8)  # Field name made lowercase.
 
+    def __str__(self):
+        return self.activityname
+
     class Meta:
         managed = False
         db_table = 'activity'

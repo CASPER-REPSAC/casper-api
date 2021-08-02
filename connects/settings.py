@@ -16,7 +16,7 @@ from pathlib import Path
 import json
 
 #JWT Configuration
-REST_USE_JWT = True
+#REST_USE_JWT = True
 
 from datetime import timedelta
 
@@ -62,23 +62,7 @@ INSTALLED_APPS = [
     #Feature : Managing
     'managing.apps.ManagingConfig',
     #django-rest framework
-    'rest_framework',
-
-
-
-
-
-    #'rest_framework_simplejwt.token_blacklist',
-    #dj-rest-auth
-    #'dj-rest-auth',
-    #'dj-rest-auth.registration',
-
-    #djang-allauth
-    #'allauth',
-    #'allauth.account',
-    #'allauth.socialaccount',
-    #'allauth.socialaccount.providers.google',
-   
+    'rest_framework', 
     #api doc module
     #'drf-yasg',
 ]
@@ -90,11 +74,14 @@ REST_FRAMEWORK = {
   'DEFAULT_PERMISSION_CLASSES' :(
       'rest_framework.permissions.IsAuthenticated',
   ),
+}
+
+'''
   'DEFAULT_AUTHENTICATION_CLASSES' :(
     'rest_framework.authentication.SessionAuthentication',
     'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
     ),
-}
+'''
 
 USERAPI_USER_MODEL_USERNAME_FIELD = None
 USERAPI_USER_EMAIL_REQUIRED = True
@@ -111,7 +98,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-#ROOT_URLCONF = 'connects.urls'
+ROOT_URLCONF = 'connects.urls'
 
 TEMPLATES = [
     {

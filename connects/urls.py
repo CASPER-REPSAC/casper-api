@@ -21,11 +21,11 @@ from managing.views import ActivityViewSet, ChapterViewSet, ChapterarticleViewSe
 from django.urls import path
 
 router = routers.DefaultRouter()
-router.register('activity',ActivityViewSet)
-router.register('chapter',ChapterViewSet)
-router.register('chapter',ChapterarticleViewSet)
-router.register('chapter',ChaptercommentViewSet)
-router.register('chapter',ChapterfileViewSet)
+router.register('activities',ActivityViewSet)
+router.register('chapters',ChapterViewSet)
+router.register('chapterarticles',ChapterarticleViewSet)
+router.register('chaptercomments',ChaptercommentViewSet)
+router.register('chapterfiles',ChapterfileViewSet)
 
 urlpatterns = [
     #path('admin/', admin.site.urls),
