@@ -20,7 +20,7 @@ class Activity(models.Model):
 class Chapter(models.Model):
     activityid = models.ForeignKey(Activity, models.DO_NOTHING, db_column='activityID')  # Field name made lowercase.
     chapterid = models.CharField(db_column='chapterID', primary_key=True, max_length=8)  # Field name made lowercase.
-    chaptercreated = models.DateTimeField(db_column='chapterCreated')  # Field name made lowercase.
+    chapterCreated = models.DateTimeField(db_column='chapterCreated')  # Field name made lowercase.
     chaptersubject = models.CharField(max_length=32)
 
     class Meta:

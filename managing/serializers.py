@@ -18,7 +18,7 @@ class ChapterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Chapter
-        fields=('activityid','chapterid','chapersubject','chapercreated')
+        fields=('activityid','chapterid','chaptersubject','chaptercreated')
 
 class ChapterarticleSerializer(serializers.ModelSerializer):
     class Meta:
