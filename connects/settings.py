@@ -60,9 +60,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     #Feature : Managing
-    'managing.apps.ManagingConfig',
+    'managing',
+    #Feature : Create Acitivity
+    'activity',
+
     #django-rest framework
     'rest_framework', 
+
     #api doc module
     #'drf-yasg',
 ]
@@ -72,21 +76,21 @@ INSTALLED_APPS = [
 
 REST_FRAMEWORK = {
   'DEFAULT_PERMISSION_CLASSES' :(
-      'rest_framework.permissions.IsAuthenticated',
+      'rest_framework.permissions.AllowAny',
   ),
+    #'DEFAULT_AUTHENTICATION_CLASSES' :(
+    #'rest_framework.permissions.IsAdminUser',
+    #'rest_framework.authentication.SessionAuthentication',
+    #'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+    #),
 }
 
 '''
-  'DEFAULT_AUTHENTICATION_CLASSES' :(
-    'rest_framework.authentication.SessionAuthentication',
-    'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
-    ),
-'''
-
 USERAPI_USER_MODEL_USERNAME_FIELD = None
 USERAPI_USER_EMAIL_REQUIRED = True
 USERAPI_USERNAME_REQUIRED = False
 USERAPI_AUTHENTICATION_METHOD = 'email'
+'''
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -117,7 +121,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'connects.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -158,7 +161,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 
