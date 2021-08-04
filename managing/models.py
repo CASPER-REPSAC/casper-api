@@ -20,23 +20,13 @@ class Activity(models.Model):
 class Chapter(models.Model):
     activityid = models.ForeignKey(Activity, models.DO_NOTHING, db_column='activityID')  # Field name made lowercase.
     chapterid = models.CharField(db_column='chapterID', primary_key=True, max_length=8)  # Field name made lowercase.
-    chapterCreated = models.DateTimeField(db_column='chapterCreated')  # Field name made lowercase.
-    chaptersubject = models.CharField(max_length=32)
+    chaptercreated = models.DateTimeField(db_column='chapterCreated')  # Field name made lowercase.
+    chaptersubject = models.CharField(db_column='chaptersubject', max_length=32)
+    chapterarticle = models.CharField(db_column='article', max_length=500)
 
     class Meta:
         managed = False
         db_table = 'chapter'
-
-
-class Chapterarticle(models.Model):
-    activityid = models.CharField(db_column='activityID', max_length=8)  # Field name made lowercase.
-    chapterid = models.ForeignKey(Chapter, models.DO_NOTHING, db_column='chapterID')  # Field name made lowercase.
-    article = models.CharField(max_length=500)
-
-    class Meta:
-        managed = False
-        db_table = 'chapterArticle'
-
 
 class Chaptercomment(models.Model):
     activityid = models.CharField(db_column='activityID', max_length=8)  # Field name made lowercase.

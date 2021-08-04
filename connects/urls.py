@@ -17,13 +17,12 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework import routers
-from managing.views import ActivityViewSet, ChapterViewSet, ChapterarticleViewSet, ChaptercommentViewSet, ChapterfileViewSet
+from managing.views import ActivityViewSet, ChapterViewSet, ChaptercommentViewSet, ChapterfileViewSet
 from django.urls import path
 
 router = routers.DefaultRouter()
 router.register('activities',ActivityViewSet)
 router.register('chapters',ChapterViewSet)
-router.register('chapterarticles',ChapterarticleViewSet)
 router.register('chaptercomments',ChaptercommentViewSet)
 router.register('chapterfiles',ChapterfileViewSet)
 

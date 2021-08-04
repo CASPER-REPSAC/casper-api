@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Activity, Chapter, Chapterarticle, Chaptercomment, Chapterfile
+from .models import Activity, Chapter, Chaptercomment, Chapterfile
 
 class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
@@ -7,9 +7,8 @@ class ActivitySerializer(serializers.ModelSerializer):
         fields=('activityname','activitytype','activityid')
 
 class ChapterSerializer(serializers.ModelSerializer):
-    #activityid =
-
     def create(self, validated_data):
+        #
         return Chapter.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
@@ -18,12 +17,7 @@ class ChapterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Chapter
-        fields=('activityid','chapterid','chaptersubject','chaptercreated')
-
-class ChapterarticleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Chapterarticle
-        fields=('activityid','chapterid','article')
+        fields=('activityid','chapterid','chaptersubject','chaptercreated','chapterarticle')
 
 class ChaptercommentSerializer(serializers.ModelSerializer):
     class Meta:
