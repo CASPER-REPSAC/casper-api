@@ -11,6 +11,9 @@ class ChapterViewSet(viewsets.ModelViewSet):
     queryset = Chapter.objects.all()
     serializer_class = ChapterSerializer
 
+    def perform_create(self, serializer):
+        return super().perform_create(serializer)
+
 class ChaptercommentViewSet(viewsets.ModelViewSet):
     queryset = Chaptercomment.objects.all()
     serializer_class = ChaptercommentSerializer

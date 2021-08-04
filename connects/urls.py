@@ -27,6 +27,6 @@ router.register('chaptercomments',ChaptercommentViewSet)
 router.register('chapterfiles',ChapterfileViewSet)
 
 urlpatterns = [
-    url('admin/', admin.site.urls),
+    #url('admin/', admin.site.urls),
     url(r'^',include(router.urls))
 ]
