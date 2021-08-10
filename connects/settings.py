@@ -9,17 +9,15 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 from pathlib import Path
-
-#for key
 import json
+from datetime import timedelta
 
 #JWT Configuration
 #REST_USE_JWT = True
-
-from datetime import timedelta
-
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME' : timedelta(hours=2),
     'REFRESH_TOKEN_LIFETIME' : timedelta(days=7),
@@ -42,10 +40,6 @@ with open ('connects/keys.json','r') as key_file:
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = json_secret_key
 
@@ -54,9 +48,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -79,24 +71,11 @@ INSTALLED_APPS = [
 
 #SITE_ID = 
 #AUTH_USER_MODEL = 'userapi.User'
-
 REST_FRAMEWORK = {
   'DEFAULT_PERMISSION_CLASSES' :(
       'rest_framework.permissions.AllowAny',
   ),
-    #'DEFAULT_AUTHENTICATION_CLASSES' :(
-    #'rest_framework.permissions.IsAdminUser',
-    #'rest_framework.authentication.SessionAuthentication',
-    #'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
-    #),
 }
-
-'''
-USERAPI_USER_MODEL_USERNAME_FIELD = None
-USERAPI_USER_EMAIL_REQUIRED = True
-USERAPI_USERNAME_REQUIRED = False
-USERAPI_AUTHENTICATION_METHOD = 'email'
-'''
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -130,8 +109,6 @@ WSGI_APPLICATION = 'connects.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
-
 DATABASES = {
     'default': {
         'ENGINE': default_ENGINE,
@@ -145,7 +122,6 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -161,27 +137,18 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'Asia/Seoul'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
-
 STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
