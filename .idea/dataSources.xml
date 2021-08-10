@@ -8,5 +8,12 @@
       <jdbc-url>jdbc:mysql://52.78.78.26:3306/apidb</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="django@52.78.78.26" uuid="f74d6947-16a8-4aaa-919d-30d78a253e6a">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://52.78.78.26:3306/django_db</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

@@ -16,6 +16,13 @@
           </advancedOptions>
         </fileTransfer>
       </webServer>
+      <webServer id="02eec0dc-9619-43c2-b468-763d31b71554" name="root" url="">
+        <fileTransfer accessType="SFTP" host="52.78.78.26" port="22" sshConfigId="243a26f9-f28b-4a1d-b2d2-ffef0b5c0970" sshConfig="casper_api" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
     </option>
   </component>
 </project>

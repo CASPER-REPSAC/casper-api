@@ -19,9 +19,28 @@ class Activity(models.Model):
     currentState = models.PositiveIntegerField(db_column='currentState', default=0)  # Field name made lowercase.
     viewerNum = models.PositiveIntegerField(db_column='viewerNum', default=0)  # Field name made lowercase.
 
+    # owner = models.ForeignKey('auth.User', related_name='activities', on_delete=models.CASCADE)
+
     class Meta:
         managed = False
         db_table = 'activity'
+
+
+class Tag(models.Model):
+    name = models.CharField(max_length=50)
+
+    class Meta:
+        managed = True
+        db_table = 'tag'
+
+
+class ActivityTag(models.Model):
+    activity = models.ForeignKey(Activity, on_delete=models.CASCADE, db_column="activity_id")
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE, db_column='tag_id')
+
+    class Meta:
+        managed = True
+        db_table = 'activity_tag'
 
 
 class AuthGroup(models.Model):
