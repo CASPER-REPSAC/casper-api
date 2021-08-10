@@ -10,7 +10,7 @@
 >
 >### 2. URI 서브리소스로 정리
 >#### GET
-> /activity/  
+> /activity  
 > /activity/{activityid}  
 > /activity/{activityid}/chapters  
 > /activity/{activityid}/chapters/{chapterid}   
