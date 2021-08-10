@@ -31,6 +31,12 @@ SIMPLE_JWT = {
 with open ('connects/keys.json','r') as key_file:
     json_file = json.load(key_file)
     json_secret_key = json_file["settings-secret-key"]
+    default_ENGINE = json_file["default-database-ENGINE"]
+    default_NAME = json_file["default-database-NAME"]
+    default_USER = json_file["default-database-USER"]
+    default_PW = json_file["default-database-PASSWORD"]
+    default_HOST = json_file["default-database-HOST"]
+    default_PORT = json_file["default-database-PORT"]
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -125,17 +131,17 @@ WSGI_APPLICATION = 'connects.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'managedb',        #db name    / default_set : BASE_DIR / 'db.sqlite3',
-        'USER':'apiuser',          #db id
-        'PASSWORD' : 'apipw',        #db pw
-        'HOST' : 'localhost',   #host ip
-        'PORT' : '3306',        #port
+        'ENGINE': default_ENGINE,
+        'NAME': default_NAME, 
+        'USER':default_USER, 
+        'PASSWORD' : default_PW,
+        'HOST' : default_HOST,
+        'PORT' : default_PORT,
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
