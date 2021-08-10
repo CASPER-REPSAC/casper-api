@@ -1,35 +1,36 @@
 from rest_framework import serializers
 from .models import Activity, Chapter, Chaptercomment, Chapterfile
 
+#Activity
 class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
-        fields=('activityname','activitytype','activityid')
+        fields=('id','author','title','category')
 
+class ActivityListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Activity
+        fields=('id','author','title','category')
+
+#Chapter
 class ChapterSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(read_only=True)
-    subject = serializers.CharField(max_length=32)
-    created = serializers.DateTimeField()
-    article = serializers.CharField(max_length=500)
-
-    def create(self, validated_data):
-        return Chapter.objects.create(**validated_data)
-
-    def update(self, instance, validated_data):
-        instance.subject = '__INPUT_HERE__'
-        instance.article = '__INPUT_HERE__'
-        return instance
-
     class Meta:
         model = Chapter
-        fields=('activityid','chapterid','chaptersubject','chaptercreated','chapterarticle')
+        fields=('chapterid','subject','created_time','modified_time','article','filepath','filesize')
 
+class ChapterListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Chapter
+        fields=('chapterid','subject','created_time')
+
+#Comment
 class ChaptercommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chaptercomment 
-        fields=('activityid','chapterid','commentcreated','comment')
+        fields=('commentpk','comment')
 
+#Attach
 class ChapterfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chapterfile
-        fields=('activityid','chapterid','filepath','filename')
+        fields=('filepk','filepath')

@@ -28,5 +28,19 @@ router.register('chapterfiles',ChapterfileViewSet)
 
 urlpatterns = [
     #url('admin/', admin.site.urls),
-    url(r'^',include(router.urls))
+    url(r'^',include(router.urls)),
+    #GET uri
+    path('activities/', ),
+    path('activities/<int:id>',)
+    #path('activities',___), #액티비티 목록 조회
+    #path('activities/<int:activityid>',___), #특정 액티비티 조회
+    #path('activities/<int:activityid>/chapters',___), #특정 액티비티의 챕터 목록 조회
+    #path('activities/<int:activityid>/chapters/<int:chapterid>',___), #특정 액티비티의 특정 챕터 조회
+    #path('activities/<int:activityid>/chapters/<int:chapterid>/comment/<int:comment_pk>',___), #특정 액티비티-챕터의 댓글 목록 조회
+
+    #POST uri
+
+    #PUT-PATCH uri
+
+    #DELETE uri
 ]
