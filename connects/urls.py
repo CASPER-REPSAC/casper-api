@@ -16,29 +16,31 @@ Including another URLconf
 
 from django.conf.urls import url, include
 from django.contrib import admin
-from rest_framework import routers
-from managing.views import ActivityViewSet, ChapterViewSet, ChaptercommentViewSet, ChapterfileViewSet
+
+from managing.views import chapter_detail, activity_list
 from django.urls import path
 
+#from rest_framework import routers
+
+'''
 router = routers.DefaultRouter()
 router.register('activities',ActivityViewSet)
 router.register('chapters',ChapterViewSet)
 router.register('chaptercomments',ChaptercommentViewSet)
 router.register('chapterfiles',ChapterfileViewSet)
+'''
 
 urlpatterns = [
     #url('admin/', admin.site.urls),
-    url(r'^',include(router.urls)),
-    #GET uri
-    path('activities/', ),
-    path('activities/<int:id>',)
+    #url(r'^',include(router.urls)),
+    #GET, POST uri 
+    path('activities/', activity_list),
+    #path('activities/<int:pk>',),
     #path('activities',___), #액티비티 목록 조회
     #path('activities/<int:activityid>',___), #특정 액티비티 조회
     #path('activities/<int:activityid>/chapters',___), #특정 액티비티의 챕터 목록 조회
-    #path('activities/<int:activityid>/chapters/<int:chapterid>',___), #특정 액티비티의 특정 챕터 조회
+    path('activities/<int:activityid>/chapters/<int:chapterid>',chapter_detail) #특정 액티비티의 특정 챕터 조회
     #path('activities/<int:activityid>/chapters/<int:chapterid>/comment/<int:comment_pk>',___), #특정 액티비티-챕터의 댓글 목록 조회
-
-    #POST uri
 
     #PUT-PATCH uri
 

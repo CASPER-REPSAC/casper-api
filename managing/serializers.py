@@ -14,9 +14,11 @@ class ActivityListSerializer(serializers.ModelSerializer):
 
 #Chapter
 class ChapterSerializer(serializers.ModelSerializer):
+    activityid = ActivitySerializer(read_only=True)
+
     class Meta:
         model = Chapter
-        fields=('chapterid','subject','created_time','modified_time','article','filepath','filesize')
+        fields=('activityid','chapterid','subject','created_time','modified_time','article','filepath','filesize')
 
 class ChapterListSerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,12 +27,18 @@ class ChapterListSerializer(serializers.ModelSerializer):
 
 #Comment
 class ChaptercommentSerializer(serializers.ModelSerializer):
+    activityid = ActivitySerializer(read_only=True)
+    chapterid = ChapterSerializer(read_only=True)
+
     class Meta:
         model = Chaptercomment 
-        fields=('commentpk','comment')
+        fields=('activityid','chapterid','commentpk','comment')
 
-#Attach
+#Attachment
 class ChapterfileSerializer(serializers.ModelSerializer):
+    activityid = ActivitySerializer(read_only=True)
+    chapterid = ChapterSerializer(read_only=True)
+
     class Meta:
         model = Chapterfile
-        fields=('filepk','filepath')
+        fields=('activityid','chapterid','filepk','filepath')
