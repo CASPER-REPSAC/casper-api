@@ -1,59 +1,42 @@
-from activity.models import Activity, ActivityTag, Tag
-from activity.serializers import ActivitySerializer, ActivityTagSerializer, TagSerializer
-# from rest_framework import generics
-# from django.contrib.auth.models import User
-# from activity.serializers import UserSerializer
+from activity.models import Activity, ActivityTag, Tag, ActivityParticipant
+from activity.serializers import *
 from rest_framework.decorators import api_view
-# from rest_framework.response import Response
-# from rest_framework.reverse import reverse
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 
-# class ActivityList(generics.ListCreateAPIView):
-#     queryset = Activity.objects.all()
-#     serializer_class = ActivitySerializer
-#
-#
-# class ActivityDetail(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = Activity.objects.all()
-#     serializer_class = ActivitySerializer
-#
-#
-# @api_view(['GET'])
-# def api_root(request, format=None):
-#     return Response({
-#         # 'users': reverse('user-list', request=request, format=format),
-#         'activities': reverse('activity-list', request=request, format=format)
-#     })
-
-
 class ActivityViewSet(viewsets.ModelViewSet):
     """
-    으앙
+    <====== ActivityViewSet ======>
+    url 가 따로 존재하는 participants 경우 HyperlinkedModelSerializer 에서 오류가 발생하여,
+    ModelSerializer를 사용하였기에 id 값과 url 을 모두 표시하였음.
     """
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly,
-    #                       IsOwnerOrReadOnly]
-
-    # @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
-    # def highlight(self, request, *args, **kwargs):
-    #     snippet = self.get_object()
-    #     return Response(snippet.highlighted)
-    #
-    # def perform_create(self, serializer):
-    #     serializer.save(owner=self.request.user)
 
 
 class TagViewSet(viewsets.ModelViewSet):
-    """TagViewSet_"""
+    """
+    <====== TagViewSet ======>
+    url : 해당 Tag의 Deatail url
+    name : 해당 Tag의 이름
+    acti : 해당 Tag가 사용된 Activity
+    """
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
 
 
 class ActivityTagViewSet(viewsets.ModelViewSet):
-    """ActivityTagViewSet_"""
+    """
+    <====== ActivityTagViewSet ======>
+    url 가 따로 존재하는 경우 -> HyperlinkedModelSerializer 에서 오류가 발생하여,
+    ModelSerializer를 사용하였기에 id 값과 url 을 모두 표시하였음.
+    """
     queryset = ActivityTag.objects.all()
     serializer_class = ActivityTagSerializer
+
+
+class ActivityParticipantViewSet(viewsets.ModelViewSet):
+    queryset = ActivityParticipant.objects.all()
+    serializer_class = ActivityParticipantSerializer

@@ -8,6 +8,7 @@
 from django.db import models
 
 
+# Create your models here.
 class Activity(models.Model):
     title = models.CharField(max_length=50)
     type = models.CharField(max_length=50)
@@ -30,16 +31,21 @@ class Tag(models.Model):
     name = models.CharField(max_length=50)
 
     class Meta:
-        managed = True
+        managed = False
         db_table = 'tag'
 
+    def __str__(self):
+        return self.name
 
+
+# Activity 와 Tag 관계 테이블
 class ActivityTag(models.Model):
-    activity = models.ForeignKey(Activity, on_delete=models.CASCADE, db_column="activity_id")
-    tag = models.ForeignKey(Tag, on_delete=models.CASCADE, db_column='tag_id')
+    activity_id = models.ForeignKey(Activity, related_name="tags", on_delete=models.CASCADE,
+                                    db_column="activity_id")
+    tag_id = models.ForeignKey(Tag, related_name="acti", on_delete=models.CASCADE, db_column='tag_id')
 
     class Meta:
-        managed = True
+        managed = False
         db_table = 'activity_tag'
 
 
@@ -85,9 +91,22 @@ class AuthUser(models.Model):
     is_active = models.IntegerField()
     date_joined = models.DateTimeField()
 
+    # nickname = models.CharField(unique=True, max_length=150)
+
     class Meta:
         managed = False
         db_table = 'auth_user'
+
+
+# Activity 와 User 관계 테이블
+class ActivityParticipant(models.Model):
+    activity_id = models.ForeignKey(Activity, related_name="participants", on_delete=models.CASCADE, db_column="activity_id")
+    user_id = models.ForeignKey(AuthUser, related_name="acti", on_delete=models.CASCADE, db_column='user_id')
+
+    # user_id = models.ForeignKey('auth.User', related_name='acti', on_delete=models.CASCADE,db_column='user_id')
+    class Meta:
+        managed = True
+        db_table = 'activity_participant'
 
 
 class AuthUserGroups(models.Model):
