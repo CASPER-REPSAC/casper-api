@@ -14,16 +14,15 @@ class ActivityListSerializer(serializers.ModelSerializer):
 
 #Chapter
 class ChapterSerializer(serializers.ModelSerializer):
-    activityid = ActivitySerializer(read_only=True)
-
     class Meta:
         model = Chapter
-        fields=('activityid','chapterid','subject','created_time','modified_time','article','filepath','filesize')
+        fields=('activityid','subject','created_time','modified_time','article','filepath','filesize')
 
 class ChapterListSerializer(serializers.ModelSerializer):
+    activityid = ActivitySerializer(read_only=True)
     class Meta:
         model = Chapter
-        fields=('chapterid','subject','created_time')
+        fields=('activityid','chapterid','subject','created_time')
 
 #Comment
 class ChaptercommentSerializer(serializers.ModelSerializer):

@@ -8,6 +8,7 @@
 from django.db import models
 
 class Activity(models.Model):
+    id = models.AutoField(primary_key=True)
     author = models.CharField(max_length=16)
     title = models.CharField(max_length=32)
     category = models.CharField(max_length=8)
@@ -18,6 +19,7 @@ class Activity(models.Model):
 
 class Chapter(models.Model):
     activityid = models.ForeignKey(Activity, models.DO_NOTHING, db_column='activityid')
+    id = models.AutoField(primary_key=True)
     subject = models.CharField(max_length=16)
     created_time = models.DateTimeField(auto_now_add=True)
     modified_time = models.DateTimeField(auto_now=True)

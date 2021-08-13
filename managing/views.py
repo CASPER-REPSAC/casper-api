@@ -22,6 +22,22 @@ def activity_list(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET', 'POST'])
+def activity_detail(request, pk):
+    if request.method == "GET":
+        chapter = Chapter.objects.get(activityid=pk)
+        serializer = ChapterListSerializer(chapter, many=True)
+        return Response(serializer.data)
+
+    elif request.method == "POST":
+        serializer = ActivitySerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 @api_view(['GET', 'POST','PUT','DELETE'])
 def chapter_detail(request, pk):
     try:
