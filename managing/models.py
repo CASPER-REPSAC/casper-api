@@ -18,8 +18,8 @@ class Activity(models.Model):
         db_table = 'activity'
 
 class Chapter(models.Model):
-    activityid = models.ForeignKey(Activity, models.DO_NOTHING, db_column='activityid')
-    id = models.AutoField(primary_key=True)
+    activityid = models.ForeignKey(Activity, related_name='chapterid',db_column='activityid', on_delete=models.CASCADE)#related_name='chapterid', on_delete=models.CASCADE)
+    chapterid = models.AutoField(primary_key=True)
     subject = models.CharField(max_length=16)
     created_time = models.DateTimeField(auto_now_add=True)
     modified_time = models.DateTimeField(auto_now=True)

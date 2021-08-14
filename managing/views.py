@@ -25,28 +25,26 @@ def activity_list(request):
 @api_view(['GET', 'POST'])
 def activity_detail(request, pk):
     if request.method == "GET":
-        chapter = Chapter.objects.get(activityid=pk)
-        serializer = ChapterListSerializer(chapter, many=True)
+        activity = Activity.objects.filter(id=pk)
+        serializer = ActivitySerializer(activity,many=True)
         return Response(serializer.data)
 
     elif request.method == "POST":
-        serializer = ActivitySerializer(data=request.data)
+        serializer = ChapterSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-
 @api_view(['GET', 'POST','PUT','DELETE'])
-def chapter_detail(request, pk):
+def chapter_detail(request, pk, chapterid):
     try:
-        chapter = Chapter.objects.get(chapterid=pk)
+        chapter = Chapter.objects.filter(activityid=pk,chapterid=chapterid)
     except Chapter.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
-        chapters = Chapter.objects.all()
+        chapters = Chapter.objects.filter(activityid=pk,chapterid=chapterid)
         serializer = ChapterListSerializer(chapters, many=True)
         return Response(serializer.data)
 
@@ -67,7 +65,8 @@ def chapter_detail(request, pk):
         chapter.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-'''
+
+
 class ActivityViewSet(viewsets.ModelViewSet):
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
@@ -83,4 +82,4 @@ class ChaptercommentViewSet(viewsets.ModelViewSet):
 class ChapterfileViewSet(viewsets.ModelViewSet):
     queryset = Chapterfile.objects.all()
     serializer_class = ChapterfileSerializer
-'''
+
