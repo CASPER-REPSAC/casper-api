@@ -9,9 +9,6 @@ class ChaptercommentSerializer(serializers.ModelSerializer):
 
 #Attachment
 class ChapterfileSerializer(serializers.ModelSerializer):
-    #activityid = ActivitySerializer(read_only=True)
-    #chapterid = ChapterSerializer(read_only=True)
-
     class Meta:
         model = Chapterfile
         fields=('activityid','chapterid','filepk','filepath')

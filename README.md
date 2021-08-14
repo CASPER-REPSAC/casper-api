@@ -5,20 +5,18 @@
 >필요 모듈 : djangorestframework, mysqlclient  
 
 
-## Todo
+## Complete  (08.14)
 >### 1. Database 모델 개편
->
 >### 2. URI 서브리소스로 정리
 >#### GET
 > /activity  
-> /activity/{activityid}  
-> /activity/{activityid}/chapters  
-> /activity/{activityid}/chapters/{chapterid}   
-> /activity/{activityid}/chapters/{chapterid}/chaptercomment    
->  
+> /activity/{activityid}   
+> /activity/{activityid}/{chapterid} 
+
+## Todo
+>### 1. URI 서브리소스로 정리
+>#### GET 
 >#### POST  
->  
->#### PUT-PATCH  
->  
+>#### PUT-PATCH   
 >#### DELETE  
 >   
