@@ -1,48 +1,25 @@
 from rest_framework import serializers
 from activity.models import *
 
+from django.contrib.auth.models import User, Group
 
-# # ModelSerializer_Version
-class ActivityParticipantSerializer(serializers.ModelSerializer):
+
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = User
+        fields = ('url', 'username', 'email', 'groups')
+
+
+class GroupSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Group
+        fields = ('url', 'name')
+
+
+class ActivityParticipantSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ActivityParticipant
-        fields = ['url', 'id', 'activity_id', 'user_id']
-
-
-# class ActivityTagSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = ActivityTag
-#         fields = ['id', 'activity_id', 'tag_id']
-#
-#
-# class TagSerializer(serializers.ModelSerializer):
-#     acti = ActivityTagSerializer(many=True, read_only=True)
-#
-#     class Meta:
-#         model = Tag
-#         fields = ['id', 'name', 'acti']
-#
-#
-# class Tag_IdSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = ActivityTag
-#         fields = ['tag_id']
-#
-#
-# class ActivitySerializer(serializers.ModelSerializer):
-#     tags = Tag_IdSerializer(many=True, read_only=True)
-#
-#     class Meta:
-#         model = Activity
-#         fields = ['id', 'title', 'type', 'author', 'createDate', 'introduce',
-#                   'startDate', 'endDate', 'currentState', 'viewerNum', 'tags']
-
-
-# HyperlinkedModelSerializer_Version
-# class ActivityParticipantSerializer(serializers.HyperlinkedModelSerializer):
-#     class Meta:
-#         model = ActivityParticipant
-#         fields = ['url', 'id', 'activity_id', 'user_id']
+        fields = ['id', 'activity_id', 'user_id']
 
 
 class ActivityTagSerializer(serializers.HyperlinkedModelSerializer):
@@ -60,15 +37,18 @@ class TagSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class Tag_IdSerializer(serializers.HyperlinkedModelSerializer):
+    # < 현재테이블 >.< FK인user컬럼 >.< 역참조관계명 >.all()
+    name = ActivityTag.objects.select_related('tag_id')
+
     class Meta:
         model = ActivityTag
         fields = ['tag_id']
 
 
-class User_IdSerializer(serializers.ModelSerializer):
+class User_IdSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ActivityParticipant
-        fields = ['url', 'user_id']
+        fields = ['user_id']
 
 
 class ActivitySerializer(serializers.HyperlinkedModelSerializer):
@@ -77,5 +57,5 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Activity
-        fields = ['url', 'id', 'title', 'type', 'author', 'createDate', 'introduce',
+        fields = ['url', 'id', 'title', 'type', 'author', 'createDate', 'description',
                   'startDate', 'endDate', 'currentState', 'viewerNum', 'tags', 'participants']

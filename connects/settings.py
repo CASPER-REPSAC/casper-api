@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # for key
 import json
 
@@ -34,7 +34,10 @@ with open('connects/keys.json') as key_file:
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+# STATIC_DIR = os.path.join(BASE_DIR, 'static')
+# STATICFILES_DIRS = [
+#     STATIC_DIR,
+# ]
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -56,51 +59,22 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    
+
     # django-rest framework
     'rest_framework',
-    #'rest_framework_simplejwt.token_blacklist',
-
-    # dj-rest-auth
-    #'dj-rest-auth',
-    #'dj-rest-auth.registration',
-
-    # djang-allauth
-    # 'allauth',
-    # 'allauth.account',
-    # 'allauth.socialaccount',
-    # 'allauth.socialaccount.providers.google',
-
-    # restapi for study info : apps.py
-    #'restapi.apps.RestapiConfig',
-    # restapi for google auth : apps.py
-    #'userapi.apps.UserapiConfig',
 
     # api doc module
     # 'drf-yasg',
 
     # apps
-    'managing',
+    # 'managing',
     'activity',
 ]
 
-# SITE_ID =
-#AUTH_USER_MODEL = 'userapi.User'
-
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',
-        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
-    ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
 }
-
-# USERAPI_USER_MODEL_USERNAME_FIELD = None
-# USERAPI_USER_EMAIL_REQUIRED = True
-# USERAPI_USERNAME_REQUIRED = False
-# USERAPI_AUTHENTICATION_METHOD = 'email'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -117,7 +91,7 @@ ROOT_URLCONF = 'connects.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['activity/static'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -186,3 +160,5 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+USE_X_FORWARDED_HOST = True

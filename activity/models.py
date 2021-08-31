@@ -11,20 +11,35 @@ from django.db import models
 # Create your models here.
 class Activity(models.Model):
     title = models.CharField(max_length=50)
-    type = models.CharField(max_length=50)
+    type_CHOICES = (
+        ('CTF', 'CTF'),
+        ('Study', 'Study'),
+        ('Project', 'Project'),
+    )
+    type = models.CharField(max_length=50, choices=type_CHOICES)
     author = models.CharField(max_length=50)
-    createDate = models.DateField(db_column='createDate')  # Field name made lowercase.
-    introduce = models.CharField(max_length=65)
-    startDate = models.DateField(db_column='startDate')  # Field name made lowercase.
-    endDate = models.DateField(db_column='endDate')  # Field name made lowercase.
-    currentState = models.PositiveIntegerField(db_column='currentState', default=0)  # Field name made lowercase.
-    viewerNum = models.PositiveIntegerField(db_column='viewerNum', default=0)  # Field name made lowercase.
-
     # owner = models.ForeignKey('auth.User', related_name='activities', on_delete=models.CASCADE)
+    # author 를 owner 로 교체해야할 때가 올 것임..
+    createDate = models.DateField(db_column='createDate')
+    description = models.CharField(max_length=65)
+    startDate = models.DateField(db_column='startDate')
+    endDate = models.DateField(db_column='endDate')
+    currentState_CHOICES = (
+        (0, '0 : 예정'),
+        (1, '1 : 진행'),
+        (2, '2 : 종료'),
+    )
+    currentState = models.PositiveIntegerField(db_column='currentState', default=0,
+                                               choices=currentState_CHOICES)
+    viewerNum = models.PositiveIntegerField(db_column='viewerNum', default=0)
+
 
     class Meta:
         managed = False
         db_table = 'activity'
+
+    def __str__(self):
+        return self.title
 
 
 class Tag(models.Model):
@@ -47,6 +62,9 @@ class ActivityTag(models.Model):
     class Meta:
         managed = False
         db_table = 'activity_tag'
+
+    def __str__(self):
+        return f"{self.activity_id} >-< {self.tag_id}"
 
 
 class AuthGroup(models.Model):
@@ -97,13 +115,18 @@ class AuthUser(models.Model):
         managed = False
         db_table = 'auth_user'
 
+    def __str__(self):
+        return f"{self.username}"
+
 
 # Activity 와 User 관계 테이블
 class ActivityParticipant(models.Model):
-    activity_id = models.ForeignKey(Activity, related_name="participants", on_delete=models.CASCADE, db_column="activity_id")
-    user_id = models.ForeignKey(AuthUser, related_name="acti", on_delete=models.CASCADE, db_column='user_id')
+    activity_id = models.ForeignKey(Activity, related_name="participants", on_delete=models.CASCADE,
+                                    db_column="activity_id")
+    # user_id = models.ForeignKey(AuthUser, related_name="acti", on_delete=models.CASCADE, db_column='user_id')
 
-    # user_id = models.ForeignKey('auth.User', related_name='acti', on_delete=models.CASCADE,db_column='user_id')
+    user_id = models.ForeignKey('auth.User', related_name='acti', on_delete=models.CASCADE, db_column='user_id')
+
     class Meta:
         managed = True
         db_table = 'activity_participant'
