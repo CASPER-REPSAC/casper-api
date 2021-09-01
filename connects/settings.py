@@ -75,7 +75,7 @@ INSTALLED_APPS = [
 
     #Feature : Managing
     'managing',
-    #Feature : Create Acitivity
+    #Feature : Create Activity
     'activity',
 
     #django-rest framework
