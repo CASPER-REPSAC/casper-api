@@ -18,12 +18,15 @@ from datetime import timedelta
 
 #JWT Configuration
 #REST_USE_JWT = True
+
+'''
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME' : timedelta(hours=2),
     'REFRESH_TOKEN_LIFETIME' : timedelta(days=7),
     'ROTATE_REFRESH_TOKENS' : False,
     'BLACKLIST_AFTER_ROTATION': True,
 }
+'''
 
 #json parse for key
 with open ('connects/keys.json','r') as key_file:
