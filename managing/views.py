@@ -1,4 +1,4 @@
-from _typeshed import FileDescriptorLike
+#from _typeshed import FileDescriptorLike
 from django.shortcuts import render, get_list_or_404
 from django.http.request import QueryDict
 import os
@@ -69,6 +69,7 @@ def chapter_detail(request, pk, chapterid):
         chapter.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+'''
 class FileView(APIView):
     parser_classes = (MultiPartParser, FormParser)
     def post(self, req, *arg, **kwargs):
@@ -80,7 +81,7 @@ class FileView(APIView):
         filetype = os.path.splitext(filename.name)[1]
         saved_filename = file_upload_path(filename.name)
         filepath = '\\'.join()
-    
+'''    
 
 
 

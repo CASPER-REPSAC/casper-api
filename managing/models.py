@@ -1,21 +1,37 @@
-# This is an auto-generated Django model module.
-# You'll have to do the following manually to clean this up:
-#   * Rearrange models' order
-#   * Make sure each model has one field with primary_key=True
-#   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
-#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
-# Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
 
 class Activity(models.Model):
     id = models.AutoField(primary_key=True)
-    author = models.CharField(max_length=16)
-    title = models.CharField(max_length=32)
-    category = models.CharField(max_length=8)
+    title = models.CharField(max_length=50)
+    type_CHOICES = (
+        ('CTF', 'CTF'),
+        ('Study', 'Study'),
+        ('Project', 'Project'),
+    )
+    type = models.CharField(max_length=50, choices=type_CHOICES)
+    author = models.CharField(max_length=50)
+    # owner = models.ForeignKey('auth.User', related_name='activities', on_delete=models.CASCADE)
+    # author 를 owner 로 교체해야할 때가 올 것임..
+    createDate = models.DateField(db_column='createDate')
+    description = models.CharField(max_length=65)
+    startDate = models.DateField(db_column='startDate')
+    endDate = models.DateField(db_column='endDate')
+    currentState_CHOICES = (
+        (0, '0 : 예정'),
+        (1, '1 : 진행'),
+        (2, '2 : 종료'),
+    )
+    currentState = models.PositiveIntegerField(db_column='currentState', default=0,
+                                               choices=currentState_CHOICES)
+    viewerNum = models.PositiveIntegerField(db_column='viewerNum', default=0)
+
 
     class Meta:
         managed = False
         db_table = 'activity'
+
+    def __str__(self):
+        return self.title
 
 class Chapter(models.Model):
     activityid = models.ForeignKey(Activity, related_name='chapterid',db_column='activityid', on_delete=models.CASCADE)#related_name='chapterid', on_delete=models.CASCADE)

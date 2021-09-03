@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import Activity, Chapter, Chaptercomment, Chapterfile
+from activity.models import *
+from activity.serializers import *
 
 #Comment
 class ChaptercommentSerializer(serializers.ModelSerializer):
@@ -30,8 +32,13 @@ class ActivityListSerializer(serializers.ModelSerializer):
         model = Activity
         fields=('id','author','title','category')
 
-class ActivitySerializer(serializers.ModelSerializer):
+
+class ActivitySerializer(serializers.HyperlinkedModelSerializer):
+    tags = Tag_IdSerializer(many=True, read_only=True)
+    participants = User_IdSerializer(many=True, read_only=True)
     chapterid = ChapterListSerializer(many=True, read_only=True)
+
     class Meta:
         model = Activity
-        fields=('chapterid','id','author','title','category')
+        fields = ['url', 'id', 'title', 'type', 'author', 'createDate', 'description',
+                  'startDate', 'endDate', 'currentState', 'viewerNum', 'tags', 'participants','chapterid']
