@@ -26,6 +26,8 @@ class Chapter(models.Model):
     article = models.CharField(max_length=500)
     filepath = models.CharField(max_length=32, blank=True, null=True)
     filesize = models.IntegerField(blank=True, null=True)
+    last = models.IntegerField(default=0, blank=True,null=True)
+    next = models.IntegerField(default=0, blank=True,null=True)
 
     class Meta:
         managed = False

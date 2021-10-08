@@ -17,12 +17,12 @@ class ChapterfileSerializer(serializers.ModelSerializer):
 class ChapterListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chapter
-        fields=('activityid','chapterid','subject','created_time')
+        fields=('activityid','chapterid','subject','created_time','last','next')
 
 class ChapterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chapter
-        fields=('activityid','chapterid','subject','created_time','modified_time','article','filepath','filesize')
+        fields=('activityid','chapterid','subject','created_time','modified_time','article','filepath','filesize','last','next')
 
 #Activity
 class ActivityListSerializer(serializers.ModelSerializer):
