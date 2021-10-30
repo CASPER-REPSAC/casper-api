@@ -1,5 +1,5 @@
 #from _typeshed import FileDescriptorLike
-from django.shortcuts import render, get_list_or_404
+from django.shortcuts import redirect, render, get_list_or_404
 from django.http.request import QueryDict
 import os
 
@@ -9,18 +9,20 @@ from rest_framework.response import Response
 from rest_framework.parsers import  MultiPartParser, FormParser #for file upload
 from rest_framework import viewsets, serializers, status
 
-from .serializers import ActivitySerializer, ActivityListSerializer, ChapterSerializer, ChapterListSerializer, ChaptercommentSerializer, ChapterfileSerializer
+from .serializers import ActivitySerializer, ChapterSerializer, ChapterListSerializer, ChaptercommentSerializer, ChapterfileSerializer
+#from activity.serializers import ActivitySerializer
 from .models import Activity, Chapter, Chaptercomment, Chapterfile
 
 @api_view(['GET', 'POST'])
 def activity_list(request):
+    context={'request': request}
     if request.method == "GET":
         activities = Activity.objects.all()
-        serializer = ActivityListSerializer(activities, many=True)
+        serializer = ActivitySerializer(activities, many=True, context=context)
         return Response(serializer.data)
 
     elif request.method == "POST":
-        serializer = ActivitySerializer(data=request.data)
+        serializer = ActivitySerializer(data=request.data, context=context)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -28,19 +30,27 @@ def activity_list(request):
 
 @api_view(['GET', 'POST'])
 def activity_detail(request, pk):
-
     if request.method == "GET":
+        context={'request': request}
         activity = Activity.objects.filter(id=pk)
-        serializer = ActivitySerializer(activity,many=True)
+        serializer = ActivitySerializer(activity, many=True, context=context)
         return Response(serializer.data)
 
     elif request.method == "POST":
+        context={'request': request}
         serializer = ChapterSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             chapterLast = Chapter.objects.filter(activityid = pk).order_by('chapterid').last()
-            serializer.save(last=chapterLast.chapterid)
+            if chapterLast is None:
+                serializer.save(last = 0)
+            else:
+                serializer.save(last = chapterLast.chapterid)
             chapterNow = Chapter.objects.filter(activityid = pk).order_by('chapterid').last()
-            chapterLast.next = chapterNow.chapterid
+            if chapterLast is None:
+                serializer.save(next = 0)
+            else:
+                serializer.save(next = chapterNow.chapterid)
+                chapterLast.next = chapterNow.chapterid
             chapterLast.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -58,7 +68,17 @@ def activity_detail(request, pk):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     '''
 
-@api_view(['GET', 'POST','PUT','DELETE'])
+@api_view(['POST'])
+def chapter_update(request,pk,chapterid):
+    update_chapter = Chapter.objects.get(chapterid=chapterid)
+    update_chapter.subject = request.POST['subject']
+    update_chapter.article = request.POST['article']
+    #update_chapter.subject = request.POST['subject']
+
+    update_chapter.save()
+    return redirect('detail',update_chapter.chapterid)
+
+@api_view(['GET', 'POST','DELETE'])
 def chapter_detail(request, pk, chapterid):
     try:
         chapter = Chapter.objects.filter(activityid=pk,chapterid=chapterid)
@@ -74,18 +94,25 @@ def chapter_detail(request, pk, chapterid):
         serializer = ChapterSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             chapterLast = Chapter.objects.filter(activityid = pk).order_by('chapterid').last()
-            serializer.save(last=chapterLast.chapterid)
+            if chapterLast is None:
+                serializer.save(last = 0)
+            else:
+                serializer.save(last = chapterLast.chapterid)
             chapterNow = Chapter.objects.filter(activityid = pk).order_by('chapterid').last()
-            chapterLast.next = chapterNow.chapterid
+            if chapterLast is None:
+                serializer.save(next = 0)
+            else:
+                serializer.save(next = chapterNow.chapterid)
+                chapterLast.next = chapterNow.chapterid
             chapterLast.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    elif request.method == "PUT":
-        serializer = ChapterSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data)
+    #elif request.method == "PUT":
+    #    serializer = ChapterSerializer(data=request.data)
+    #    if serializer.is_valid(raise_exception=True):
+    #        serializer.save()
+    #        return Response(serializer.data)
 
     elif request.method == "DELETE":
         #chapters = Chapter.objects.filter(activityid=pk)
