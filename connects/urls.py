@@ -10,11 +10,12 @@ urlpatterns = [
     
     #GET, POST uri 
     #path('', activity_list),
+
     path('api/activities', activity_list),
     path('api/activities/', activity_list),
     path('api/activities/<int:pk>',activity_detail),
     path('api/activities/<int:pk>/',activity_detail),
-    
+
     #UPDATE uri
     path('api/activities/<int:pk>/chapter/<int:chapterid>/update_chapter',chapter_update),
     #DELETE uri

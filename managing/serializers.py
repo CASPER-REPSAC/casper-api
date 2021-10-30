@@ -5,6 +5,7 @@ from .serializers import *
 from activity.models import *
 from activity.serializers import Tag_IdSerializer, User_IdSerializer
 
+
 #Comment
 class ChaptercommentSerializer(serializers.ModelSerializer):
     class Meta:

@@ -141,6 +141,7 @@ def chapter_detail(request, pk, chapterid):
 
         chapter.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
 '''
 class FileView(APIView):
     parser_classes = (MultiPartParser, FormParser)
