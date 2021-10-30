@@ -1,7 +1,10 @@
 from rest_framework import serializers
-from .models import Activity, Chapter, Chaptercomment, Chapterfile
+from .models import Chapter, Chaptercomment, Chapterfile
+from .serializers import *
+
 from activity.models import *
-from activity.serializers import *
+from activity.serializers import Tag_IdSerializer, User_IdSerializer
+
 
 #Comment
 class ChaptercommentSerializer(serializers.ModelSerializer):
@@ -19,19 +22,18 @@ class ChapterfileSerializer(serializers.ModelSerializer):
 class ChapterListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chapter
-        fields=('activityid','chapterid','subject','created_time')
+        fields=('activityid','chapterid','subject','created_time','last','next')
 
 class ChapterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chapter
-        fields=('activityid','chapterid','subject','created_time','modified_time','article','filepath','filesize')
+        fields=('activityid','chapterid','subject','created_time','modified_time','article','filepath','filesize','last','next')
 
 #Activity
 class ActivityListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
-        fields=('id','author','title','category')
-
+        fields=('id','author','title')
 
 class ActivitySerializer(serializers.HyperlinkedModelSerializer):
     tags = Tag_IdSerializer(many=True, read_only=True)
@@ -40,5 +42,6 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Activity
-        fields = ['url', 'id', 'title', 'type', 'author', 'createDate', 'description',
-                  'startDate', 'endDate', 'currentState', 'viewerNum', 'tags', 'participants','chapterid']
+        fields = ('url', 'id', 'title', 'type', 'author', 'createDate', 'description',
+                  'startDate', 'endDate', 'currentState', 'viewerNum', 'tags', 'participants','chapterid')
+
