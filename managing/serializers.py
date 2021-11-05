@@ -6,34 +6,45 @@ from activity.models import *
 from activity.serializers import Tag_IdSerializer, User_IdSerializer
 
 
-#Comment
+# Comment
 class ChaptercommentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Chaptercomment 
-        fields=('activityid','chapterid','commentpk','comment')
+        model = Chaptercomment
+        fields = ('activityid', 'chapterid', 'commentpk', 'comment')
 
-#Attachment
+
+# Attachment
 class ChapterfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chapterfile
-        fields=('activityid','chapterid','filepk','filepath')
+        fields = ('activityid', 'chapterid', 'filepk', 'filepath')
 
-#Chapter
+
+# Chapter
 class ChapterListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chapter
-        fields=('activityid','chapterid','subject','created_time','last','next')
+        fields = ('activityid', 'chapterid', 'subject', 'created_time', 'last', 'next')
+
 
 class ChapterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chapter
-        fields=('activityid','chapterid','subject','created_time','modified_time','article','filepath','filesize','last','next')
+        fields = (
+        'activityid', 'chapterid', 'subject', 'created_time', 'modified_time', 'article', 'filepath', 'filesize',
+        'last', 'next')
 
-#Activity
+
+# Activity
 class ActivityListSerializer(serializers.ModelSerializer):
+    tags = Tag_IdSerializer(many=True, read_only=True)
+    participants = User_IdSerializer(many=True, read_only=True)
+
     class Meta:
         model = Activity
-        fields=('id','author','title')
+        fields = ('id', 'title', 'type', 'author', 'createDate', 'description',
+                  'startDate', 'endDate', 'currentState', 'viewerNum', 'tags', 'participants')
+
 
 class ActivitySerializer(serializers.HyperlinkedModelSerializer):
     tags = Tag_IdSerializer(many=True, read_only=True)
@@ -43,5 +54,4 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Activity
         fields = ('url', 'id', 'title', 'type', 'author', 'createDate', 'description',
-                  'startDate', 'endDate', 'currentState', 'viewerNum', 'tags', 'participants','chapterid')
-
+                  'startDate', 'endDate', 'currentState', 'viewerNum', 'tags', 'participants', 'chapterid')
