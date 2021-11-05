@@ -18,9 +18,8 @@ import os
 import json
 from datetime import timedelta
 
-
-#JWT Configuration
-#REST_USE_JWT = True
+# JWT Configuration
+# REST_USE_JWT = True
 
 '''
 SIMPLE_JWT = {
@@ -43,8 +42,6 @@ with open('connects/keys.json') as key_file:
     default_HOST = json_file["default-database-HOST"]
     default_PORT = json_file["default-database-PORT"]
 
-
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 # STATIC_DIR = os.path.join(BASE_DIR, 'static')
@@ -61,7 +58,7 @@ SECRET_KEY = json_secret_key
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*', 'localhost', '127.0.0.1', ]
 
 # Application definition
 INSTALLED_APPS = [
@@ -73,25 +70,24 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
-    #Feature : Managing
+    # Feature : Managing
     'managing',
-    #Feature : Create Activity
+    # Feature : Create Activity
     'activity',
 
-    #django-rest framework
-    'rest_framework', 
+    # django-rest framework
+    'rest_framework',
 
-    #api doc module
-    #'drf-yasg',
+    # api doc module
+    # 'drf-yasg',
 ]
 
-
-#SITE_ID = 
-#AUTH_USER_MODEL = 'userapi.User'
+# SITE_ID =
+# AUTH_USER_MODEL = 'userapi.User'
 REST_FRAMEWORK = {
-   'DEFAULT_PERMISSION_CLASSES' :(
-      'rest_framework.permissions.AllowAny',
-  ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',
+    ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10
 }
@@ -131,11 +127,11 @@ WSGI_APPLICATION = 'connects.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': default_ENGINE,
-        'NAME': default_NAME, 
-        'USER':default_USER, 
-        'PASSWORD' : default_PW,
-        'HOST' : default_HOST,
-        'PORT' : default_PORT,
+        'NAME': default_NAME,
+        'USER': default_USER,
+        'PASSWORD': default_PW,
+        'HOST': default_HOST,
+        'PORT': default_PORT,
     }
 }
 
@@ -176,4 +172,4 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-USE_X_FORWARDED_HOST = True
+# USE_X_FORWARDED_HOST = True

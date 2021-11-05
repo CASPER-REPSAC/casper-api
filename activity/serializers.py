@@ -4,31 +4,31 @@ from activity.models import *
 from django.contrib.auth.models import User, Group
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('url', 'username', 'email', 'groups')
 
 
-class GroupSerializer(serializers.HyperlinkedModelSerializer):
+class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = ('url', 'name')
 
 
-class ActivityParticipantSerializer(serializers.HyperlinkedModelSerializer):
+class ActivityParticipantSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityParticipant
         fields = ['id', 'activity_id', 'user_id']
 
 
-class ActivityTagSerializer(serializers.HyperlinkedModelSerializer):
+class ActivityTagSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityTag
-        fields = ['id', 'activity_id', 'tag_id']
+        fields = ['url', 'id', 'activity_id', 'tag_id']
 
 
-class TagSerializer(serializers.HyperlinkedModelSerializer):
+class TagSerializer(serializers.ModelSerializer):
     acti = ActivityTagSerializer(many=True, read_only=True)
 
     class Meta:
@@ -36,7 +36,7 @@ class TagSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['url', 'id', 'name', 'acti']
 
 
-class Tag_IdSerializer(serializers.HyperlinkedModelSerializer):
+class Tag_IdSerializer(serializers.ModelSerializer):
     # < 현재테이블 >.< FK인user컬럼 >.< 역참조관계명 >.all()
     name = ActivityTag.objects.select_related('tag_id')
 
@@ -45,13 +45,13 @@ class Tag_IdSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['tag_id']
 
 
-class User_IdSerializer(serializers.HyperlinkedModelSerializer):
+class User_IdSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityParticipant
         fields = ['user_id']
 
 
-class ActivitySerializer(serializers.HyperlinkedModelSerializer):
+class ActivitySerializer(serializers.ModelSerializer):
     tags = Tag_IdSerializer(many=True, read_only=True)
     participants = User_IdSerializer(many=True, read_only=True)
 
