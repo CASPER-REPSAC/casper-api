@@ -31,18 +31,18 @@ class ChapterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chapter
         fields = (
-        'activityid', 'chapterid', 'subject', 'created_time', 'modified_time', 'article', 'filepath', 'filesize',
-        'last', 'next')
+            'activityid', 'chapterid', 'subject', 'created_time', 'modified_time', 'article', 'filepath', 'filesize',
+            'last', 'next')
 
 
 # Activity
-class ActivityListSerializer(serializers.ModelSerializer):
+class ActivityListSerializer(serializers.HyperlinkedModelSerializer):
     tags = Tag_IdSerializer(many=True, read_only=True)
     participants = User_IdSerializer(many=True, read_only=True)
 
     class Meta:
         model = Activity
-        fields = ('id', 'title', 'type', 'author', 'createDate', 'description',
+        fields = ('url', 'id', 'title', 'type', 'author', 'createDate', 'description',
                   'startDate', 'endDate', 'currentState', 'viewerNum', 'tags', 'participants')
 
 
