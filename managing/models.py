@@ -32,10 +32,17 @@ class Chaptercomment(models.Model):
 
 class Chapterfile(models.Model):
     filepk = models.AutoField(primary_key=True)
-    activityid = models.ForeignKey(Activity, db_column='activityid', on_delete=models.CASCADE)
+    activityid = models.IntegerField()
     chapterid = models.ForeignKey(Chapter, models.DO_NOTHING, db_column='chapterid')
     filepath = models.CharField(max_length=64)
+    filename = models.CharField(max_length=100)
+    create_date = models.DateTimeField(auto_now_add=True)
+    fileext = models.CharField(max_length=5)
+    file = models.FileField(upload_to=sett.MEDIA_URL, null=False)
+    def __str__(self):
+        return self.filename
 
     class Meta:
         managed = False
+        ordering = ['chapterid']
         db_table = 'chapterfile'
