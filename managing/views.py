@@ -1,20 +1,25 @@
 # from _typeshed import FileDescriptorLike
+import os, datetime, uuid, json
+
 from django.shortcuts import redirect, render, get_list_or_404
-from django.http.request import QueryDict
-import os
-
-from rest_framework.decorators import api_view
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser, FormParser  # for file upload
-from rest_framework import viewsets, serializers, status
-
-from activity.serializers import TagSerializer
-from .serializers import *
-from .models import Activity, Chapter, Chaptercomment, Chapterfile
-from activity.models import *
+from django.http import HttpResponse, JsonResponse, QueryDict
+from django.utils.encoding import filepath_to_uri
+from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
 
 from rest_framework.utils.serializer_helpers import ReturnDict, ReturnList
+from rest_framework.decorators import api_view
+from rest_framework.exceptions import ParseError
+from rest_framework.parsers import MultiPartParser, FormParser, FileUploadParser  # for file upload
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import viewsets, serializers, status
+
+from connects import settings
+from activity.serializers import TagSerializer
+from activity.models import *
+from .serializers import *
+from .models import Activity, Chapter, Chaptercomment, Chapterfile
 
 
 ####start#####
@@ -100,19 +105,19 @@ def activity_detail(request, pk):
         return Response(serializer.data)
 
     elif request.method == "POST":
-        context = {'request': request}
+        context={'request': request}
         serializer = ChapterSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            chapterLast = Chapter.objects.filter(activityid=pk).order_by('chapterid').last()
+            chapterLast = Chapter.objects.filter(activityid = pk).order_by('chapterid').last()
             if chapterLast is None:
-                serializer.save(last=0)
+                serializer.save(last = 0)
             else:
-                serializer.save(last=chapterLast.chapterid)
-            chapterNow = Chapter.objects.filter(activityid=pk).order_by('chapterid').last()
+                serializer.save(last = chapterLast.chapterid)
+            chapterNow = Chapter.objects.filter(activityid = pk).order_by('chapterid').last()
             if chapterLast is None:
-                serializer.save(next=0)
+                serializer.save(next = 0)
             else:
-                serializer.save(next=chapterNow.chapterid)
+                serializer.save(next = chapterNow.chapterid)
                 chapterLast.next = chapterNow.chapterid
             chapterLast.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -142,64 +147,62 @@ def chapter_update(request, pk, chapterid):
     return redirect('detail', update_chapter.chapterid)
 
 
-@api_view(['GET', 'POST', 'DELETE'])
+@api_view(['GET', 'POST','DELETE'])
 def chapter_detail(request, pk, chapterid):
     try:
-        chapter = Chapter.objects.filter(activityid=pk, chapterid=chapterid)
+        chapter = Chapter.objects.filter(activityid=pk,chapterid=chapterid)
     except Chapter.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
-        chapters = Chapter.objects.filter(activityid=pk, chapterid=chapterid)
+        chapters = Chapter.objects.filter(activityid=pk,chapterid=chapterid)
         serializer = ChapterSerializer(chapters, many=True)
         return Response(serializer.data)
 
     elif request.method == "POST":
         serializer = ChapterSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            chapterLast = Chapter.objects.filter(activityid=pk).order_by('chapterid').last()
+            chapterLast = Chapter.objects.filter(activityid = pk).order_by('chapterid').last()
             if chapterLast is None:
-                serializer.save(last=0)
+                serializer.save(last = 0)
             else:
-                serializer.save(last=chapterLast.chapterid)
-            chapterNow = Chapter.objects.filter(activityid=pk).order_by('chapterid').last()
+                serializer.save(last = chapterLast.chapterid)
+            chapterNow = Chapter.objects.filter(activityid = pk).order_by('chapterid').last()
             if chapterLast is None:
-                serializer.save(next=0)
+                serializer.save(next = 0)
             else:
-                serializer.save(next=chapterNow.chapterid)
+                serializer.save(next = chapterNow.chapterid)
                 chapterLast.next = chapterNow.chapterid
             chapterLast.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # elif request.method == "PUT":
+    #elif request.method == "PUT":
     #    serializer = ChapterSerializer(data=request.data)
     #    if serializer.is_valid(raise_exception=True):
     #        serializer.save()
     #        return Response(serializer.data)
 
     elif request.method == "DELETE":
-        # chapters = Chapter.objects.filter(activityid=pk)
-        # serializer = ChapterSerializer(data=request.data)
-        # print(dir(Chapter.objects))
-        chapterLast = Chapter.objects.filter(activityid=pk, chapterid__lt=chapter.values('chapterid')).order_by(
-            'chapterid').last()
-        chapterNext = Chapter.objects.filter(activityid=pk, chapterid__gt=chapter.values('chapterid')).order_by(
-            'chapterid').first()
+        #chapters = Chapter.objects.filter(activityid=pk)
+        #serializer = ChapterSerializer(data=request.data)
+        #print(dir(Chapter.objects))
+        chapterLast = Chapter.objects.filter(activityid = pk, chapterid__lt=chapter.values('chapterid')).order_by('chapterid').last()
+        chapterNext = Chapter.objects.filter(activityid = pk, chapterid__gt=chapter.values('chapterid')).order_by('chapterid').first()
 
-        # serializerLast = ChapterSerializer(data=chapterLast.__dict__)
-        # serializerNext = ChapterSerializer(data=chapterNext.__dict__)
+        #serializerLast = ChapterSerializer(data=chapterLast.__dict__)
+        #serializerNext = ChapterSerializer(data=chapterNext.__dict__)
 
-        # print(dir(serializerNext))
-        if chapterNext is None:  # and serializerLast.is_valid(raise_exception=True):
+        #print(dir(serializerNext))
+        if chapterNext is None:#and serializerLast.is_valid(raise_exception=True):
             chapterLast.next = 0
             chapterLast.save()
 
-        elif (chapterLast is None):  # and serializerNext.is_valid(raise_exception=True):
+        elif (chapterLast is None): # and serializerNext.is_valid(raise_exception=True):
             chapterNext.last = 0
             chapterNext.save()
 
-        else:  # serializerLast.is_valid(raise_exception=True) and serializerNext.is_valid(raise_exception=True):
+        else: # serializerLast.is_valid(raise_exception=True) and serializerNext.is_valid(raise_exception=True):
             chapterLast.next = chapterNext.chapterid
             chapterNext.last = chapterLast.chapterid
             chapterLast.save()
@@ -209,19 +212,48 @@ def chapter_detail(request, pk, chapterid):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-'''
 class FileView(APIView):
-    parser_classes = (MultiPartParser, FormParser)
-    def post(self, req, *arg, **kwargs):
-        activityid = 
-        chapterid =
-        filepk =
-        filedata = req.data.dict()
-        filename = req.data['file_name']
-        filetype = os.path.splitext(filename.name)[1]
-        saved_filename = file_upload_path(filename.name)
-        filepath = '\\'.join()
-'''
+
+    parser_classes = (FileUploadParser,)
+
+    def post(self, request,filename, format=None, *args, **kwargs):
+
+        if 'file' not in request.FILES:
+            raise ParseError("Empty content")
+
+        f = request.FILES['file']
+        #print(f)
+        #print(dir(request))
+        #print(request.__dict__)
+
+        addAttr = request.data
+        #file_name = request.data['filename']
+        
+        #new_file_full_name = file_upload_path(file_name.name)
+        #file_path = '/'.join(new_file_full_name.split('/')[0:-1])
+        date = datetime.datetime.now()
+        print(date, datetime.datetime.now())
+        #model Attr
+        addAttr['activityid'] = request.parser_context['kwargs']['pk']
+        addAttr['chapterid'] = request.parser_context['kwargs']['chapterid']
+        addAttr['filepath'] = '/' #file_path
+        addAttr['filename'] = filename
+        addAttr['fileext'] = 'pdf' #os.path.splitext(file_name.name)[1]
+        addAttr['create_date'] = date
+        addAttr['file'] = f
+        addAttrDict = QueryDict('', mutable=True)
+        addAttrDict.update(addAttr)
+
+        fileSerializer = ChapterfileSerializer(data = addAttrDict)
+        if fileSerializer.is_valid():
+            
+            fileSerializer.save()       
+            print(fileSerializer.data)
+
+            return Response(status=status.HTTP_201_CREATED)
+        else:
+            print(fileSerializer.errors)
+            return Response(fileSerializer.errors, status=status.HTTP_400_BAD_REQUEST)   
 
 
 class ActivityViewSet(viewsets.ModelViewSet):
