@@ -17,7 +17,7 @@ class ChaptercommentSerializer(serializers.ModelSerializer):
 class ChapterfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chapterfile
-        fields = ('activityid', 'chapterid', 'filepk', 'filepath')
+        fields = ('activityid','chapterid', 'filepath','filename','fileext','file')
 
 
 # Chapter
@@ -28,6 +28,9 @@ class ChapterListSerializer(serializers.ModelSerializer):
 
 
 class ChapterSerializer(serializers.ModelSerializer):
+    
+    files = ChapterfileSerializer(many=True, read_only=True)
+    
     class Meta:
         model = Chapter
         fields = (
