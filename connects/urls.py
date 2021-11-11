@@ -2,7 +2,7 @@ from django.conf.urls import url, include
 from django.urls import path
 from django.contrib import admin
 from managing.views import activity_detail, activity_list, chapter_detail, chapter_update,ChapterViewSet
-from managing.views import ActivityViewSet
+from managing.views import ActivityViewSet, FileView, APIView
 
 admin.autodiscover()
 urlpatterns = [
@@ -10,7 +10,6 @@ urlpatterns = [
 
     # GET, POST uri
     # path('', activity_list),
-
     # path('api/w00/activities', activity_list),
     path('api/w00/activities/', ActivityViewSet),
     path('api/activities/', activity_list),
@@ -24,5 +23,8 @@ urlpatterns = [
     path('api/activities/<int:pk>/chapter/<int:chapterid>', chapter_detail),
     path('api/activities/<int:pk>/chapter/<int:chapterid>/', chapter_detail),
 
+    #Fileupload
+    path('api/activities/<int:pk>/chapter/<int:chapterid>/upload/<str:filename>', FileView.as_view()), #
+    
     path('api/', include('activity.urls')),
 ]
