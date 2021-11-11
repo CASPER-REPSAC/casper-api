@@ -33,7 +33,8 @@ class Chaptercomment(models.Model):
 
 class Chapterfile(models.Model):
     filepk = models.AutoField(primary_key=True)
-    activityid = models.IntegerField()
+    #activityid = models.IntegerField()
+    activityid = models.ForeignKey(Activity, db_column='activityid', on_delete=models.CASCADE)
     chapterid = models.ForeignKey(Chapter, models.DO_NOTHING, db_column='chapterid')
     filepath = models.CharField(max_length=64)
     filename = models.CharField(max_length=100)
