@@ -12,16 +12,17 @@ urlpatterns = [
     # path('', activity_list),
     # path('api/w00/activities', activity_list),
     path('api/w00/activities/', ActivityViewSet),
-    path('api/activities/', activity_list),
+    path('api/activities', activity_list),
+    #path('api/activities/', activity_list),
     path('api/activities/<int:pk>', activity_detail),
-    path('api/activities/<int:pk>/', activity_detail),
+    #path('api/activities/<int:pk>/', activity_detail),
 
     # UPDATE uri
     path('api/activities/<int:pk>/chapter/<int:chapterid>/update_chapter', chapter_update),
 
     # DELETE uri
     path('api/activities/<int:pk>/chapter/<int:chapterid>', chapter_detail),
-    path('api/activities/<int:pk>/chapter/<int:chapterid>/', chapter_detail),
+    #path('api/activities/<int:pk>/chapter/<int:chapterid>/', chapter_detail),
 
     #Fileupload
     path('api/activities/<int:pk>/chapter/<int:chapterid>/upload/<str:filename>', FileView.as_view()), #
