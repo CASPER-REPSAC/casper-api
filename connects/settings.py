@@ -2,18 +2,6 @@ from pathlib import Path
 from datetime import timedelta
 import os, json
 
-# JWT Configuration
-# REST_USE_JWT = True
-
-'''
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME' : timedelta(hours=2),
-    'REFRESH_TOKEN_LIFETIME' : timedelta(days=7),
-    'ROTATE_REFRESH_TOKENS' : False,
-    'BLACKLIST_AFTER_ROTATION': True,
-}
-'''
-
 # json parse for key
 with open('connects/keys.json') as key_file:
     json_file = json.load(key_file)
@@ -25,6 +13,8 @@ with open('connects/keys.json') as key_file:
     default_PW = json_file["default-database-PASSWORD"]
     default_HOST = json_file["default-database-HOST"]
     default_PORT = json_file["default-database-PORT"]
+    STATE = json_file["STATE"]
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,10 +29,10 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
 # ]
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
-
+SECRET_KEY = json_secret_key
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = json_secret_key
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -61,28 +51,54 @@ INSTALLED_APPS = [
 
     # Feature : Managing
     'managing',
+
     # Feature : Create Activity
     'activity',
 
+    # Feature: SocialLogin
+    'accounts',
+
     # django-rest framework
     'rest_framework',
+    'rest_framework_simplejwt.token_blacklist',
+    'rest_framework.authtoken',
 
     #CORS
     'corsheaders',
     
     # api doc module
     # 'drf-yasg',
+
+    # dj-rest-auth
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+
+    # django-allauth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.kakao',
+    'allauth.socialaccount.providers.github',
+    'allauth.socialaccount.providers.google',
+
+    # 'rest_auth',
+    # 'rest_auth.registration'
 ]
 
-# SITE_ID =
-# AUTH_USER_MODEL = 'userapi.User'
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.AllowAny',
+        # 'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10
+    'PAGE_SIZE': 10,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+    ),
 }
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -191,7 +207,24 @@ STATIC_URL = '/static/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # USE_X_FORWARDED_HOST = True
+
+AUTH_USER_MODEL = 'accounts.User'
+
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None # username 필드 사용 x
+ACCOUNT_EMAIL_REQUIRED = True            # email 필드 사용 o
+ACCOUNT_USERNAME_REQUIRED = False        # username 필드 사용 x
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+
+# JWT Configuration
+REST_USE_JWT = True
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+}
+

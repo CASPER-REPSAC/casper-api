@@ -45,14 +45,23 @@ def addUserName(response_data):
         for o_idx, tag in enumerate(_object['participants']):
             response_data[d_idx]['participants'][o_idx]['user_name'] = str(user_list.get(pk=tag['user_id']))
     # return response_data # 리턴이 없어도 serializer.data 가 수정됨.
+
+
 ######end#####
 
 
 @api_view(['GET', 'POST'])
-def activity_list(request):
+def activity_list(request, filter_type):
+    """
+    나와요옹
+    """
     context = {'request': request}
     if request.method == "GET":
-        activities = Activity.objects.all()
+        print(request.GET.get("type"))
+        # if filter_type is not None:
+        #     activities = Activity.objects.all().filter(type=filter_type)
+        # else:
+        activities = Activity.objects.all().filter(type="CTF")
         serializer = ActivityListSerializer(activities, many=True, context=context)
 
         ####start#####
@@ -71,7 +80,7 @@ def activity_list(request):
             ####start#####
             ### 공사중 ###
             if 'tags' in request.data:
-                activity_instance = Activity.objects.get(pk=serializer.data['id']) # 방금 생성된 activity_instance 가져옴
+                activity_instance = Activity.objects.get(pk=serializer.data['id'])  # 방금 생성된 activity_instance 가져옴
                 req_tags = request.data['tags']  # post 로 입력받은 태그 리스트
                 exist_tags = [tag.name for tag in Tag.objects.all()]  # 존재하는 태그 가져옴
                 for r_tag in req_tags:
@@ -81,12 +90,17 @@ def activity_list(request):
                     ActivityTag(activity_id=activity_instance, tag_id=tag_instance).save()  # activity 랑 tag 연결
                 # 문제 발견, 태그 생성은 되는데 response 에 보이질 않음.
                 serializer = ActivityListSerializer(activity_instance, context=context)
-                # 시리얼라이저를 재정의해서 데이터를 다시가져오는 것으로 해결.
+                # serializer 를 ActivityListSerializer 로 재정의해서 데이터를 다시가져오는 것으로 해결.
                 addTagName(serializer.data)
             ######end#####
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == "PUT":
+        pass
+    elif request.method == "DELETE":
+        pass
 
 
 @api_view(['GET', 'POST'])

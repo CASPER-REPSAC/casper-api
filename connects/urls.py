@@ -6,16 +6,15 @@ from managing.views import ActivityViewSet, FileView, APIView
 
 admin.autodiscover()
 urlpatterns = [
+
     url('admin/', admin.site.urls),
 
     # GET, POST uri
-    # path('', activity_list),
-    # path('api/w00/activities', activity_list),
+
     path('api/w00/activities/', ActivityViewSet),
+    path('api/activities/type/<str:filter_type>', activity_list),
     path('api/activities', activity_list),
-    #path('api/activities/', activity_list),
     path('api/activities/<int:pk>', activity_detail),
-    #path('api/activities/<int:pk>/', activity_detail),
 
     # UPDATE uri
     path('api/activities/<int:pk>/chapter/<int:chapterid>/update_chapter', chapter_update),
@@ -28,4 +27,11 @@ urlpatterns = [
     path('api/activities/<int:pk>/chapter/<int:chapterid>/upload/<str:filename>', FileView.as_view()), #
     
     path('api/', include('activity.urls')),
+]
+
+urlpatterns += [
+    path('admin/', admin.site.urls),
+    path('accounts/', include('dj_rest_auth.urls')),
+    path('accounts/', include('allauth.urls')),
+    path('accounts/', include('accounts.urls')),
 ]

@@ -1,11 +1,23 @@
-from activity.models import Activity, ActivityTag, Tag, ActivityParticipant
 from activity.serializers import *
-from rest_framework.decorators import api_view
+from activity.models import *
 from rest_framework import viewsets
-from rest_framework.decorators import action
-from rest_framework.response import Response
 
 from django.views.decorators.csrf import csrf_exempt
+
+from rest_framework import generics
+
+
+# class FilterActivityList(generics.ListAPIView):
+#     serializer_class = ActivitySerializer
+#
+#     def get_queryset(self):
+#         """
+#         This view should return a list of all the purchases
+#         for the currently authenticated user.
+#         """
+#         type = self.kwargs['type']
+#         print(type)
+#         return Activity.objects.filter(type=type)
 
 
 class ActivityViewSet(viewsets.ModelViewSet):

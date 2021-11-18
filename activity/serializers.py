@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from activity.models import *
-
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
+from accounts.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
