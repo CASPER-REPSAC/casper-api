@@ -44,7 +44,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 SOCIAL_AUTH_GOOGLE_CLIENT_ID = default_authid
 SOCIAL_AUTH_GOOGLE_SECRET = default_authsecret
-SITE_ID = 2 #default_siteid
+SITE_ID = 4 #default_siteid
 
 
 
@@ -148,7 +148,7 @@ MIDDLEWARE = [
 
 # CORS
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_CREDENTIALS = True #전체 주소 허용 
+CORS_ALLOW_CREDENTIALS = True #전체 주소 허용
 CORS_ALLOW_METHODS = (
     'DELETE',
     'GET',
@@ -167,6 +167,9 @@ CORS_ALLOW_HEADERS = (
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
+    'application/json',
+    'text/plain',
+    '/'
 )
 # 특정 주소 허용 
 #CORS_ORIGIN_WHITELIST = [
