@@ -28,4 +28,8 @@ urlpatterns = [
     path('api/activities/<int:pk>/chapter/<int:chapterid>/upload/<str:filename>', FileView.as_view()), #
     
     path('api/', include('activity.urls')),
+
+    path('accounts/', include('dj_rest_auth.urls')),
+    path('accounts/', include('allauth.urls')),
+    path('accounts/', include('accounts.urls')),
 ]

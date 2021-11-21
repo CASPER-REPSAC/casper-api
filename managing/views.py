@@ -22,6 +22,9 @@ from .serializers import *
 from .models import Activity, Chapter, Chaptercomment, Chapterfile
 
 
+
+
+
 ####start#####
 ### 공사중 ###
 def addTagName(response_data):
