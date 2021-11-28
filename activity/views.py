@@ -1,23 +1,13 @@
 from activity.serializers import *
 from activity.models import *
 from rest_framework import viewsets
-
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.settings import api_settings
+from connects.utils import *
 from django.views.decorators.csrf import csrf_exempt
 
-from rest_framework import generics
-
-
-# class FilterActivityList(generics.ListAPIView):
-#     serializer_class = ActivitySerializer
-#
-#     def get_queryset(self):
-#         """
-#         This view should return a list of all the purchases
-#         for the currently authenticated user.
-#         """
-#         type = self.kwargs['type']
-#         print(type)
-#         return Activity.objects.filter(type=type)
+from rest_framework.generics import _get_object_or_404
 
 
 class ActivityViewSet(viewsets.ModelViewSet):

@@ -13,8 +13,9 @@ with open('connects/keys.json') as key_file:
     default_PW = json_file["default-database-PASSWORD"]
     default_HOST = json_file["default-database-HOST"]
     default_PORT = json_file["default-database-PORT"]
+    SOCIAL_AUTH_GOOGLE_CLIENT_ID = json_file["SOCIAL_AUTH_GOOGLE_CLIENT_ID"]
+    SOCIAL_AUTH_GOOGLE_SECRET = json_file["SOCIAL_AUTH_GOOGLE_SECRET"]
     STATE = json_file["STATE"]
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -63,9 +64,9 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'rest_framework.authtoken',
 
-    #CORS
+    # CORS
     'corsheaders',
-    
+
     # api doc module
     # 'drf-yasg',
 
@@ -98,8 +99,6 @@ REST_FRAMEWORK = {
     ),
 }
 
-SITE_ID = 1
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -111,9 +110,9 @@ MIDDLEWARE = [
 ]
 
 ##CORS
-CORS_ORIGIN_ALLOW_ALL=True
-CORS_ALLOW_CREDENTIALS = True #전체 주소 허용 
-# 특정 주소 허용 
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True  # 전체 주소 허용
+# 특정 주소 허용
 # CORS_ORIGIN_WHITELIST = (
 #     'www.mysite.com',
 #     'www.anothersite.com'
@@ -192,7 +191,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ko-kr'
 
 TIME_ZONE = 'Asia/Seoul'
 
@@ -209,17 +208,21 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_HOST = True
+
+SITE_ID = 4
 
 AUTH_USER_MODEL = 'accounts.User'
 
-ACCOUNT_USER_MODEL_USERNAME_FIELD = None # username 필드 사용 x
-ACCOUNT_EMAIL_REQUIRED = True            # email 필드 사용 o
-ACCOUNT_USERNAME_REQUIRED = False        # username 필드 사용 x
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None  # username 필드 사용 x
+ACCOUNT_EMAIL_REQUIRED = True  # email 필드 사용 o
+ACCOUNT_USERNAME_REQUIRED = False  # username 필드 사용 x
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_UNIQUE_EMAIL = True
+USERNAME_FIELD = 'email'
 
 # JWT Configuration
-REST_USE_JWT = True
+# REST_USE_JWT = True
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),

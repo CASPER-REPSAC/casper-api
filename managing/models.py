@@ -15,7 +15,7 @@ class Chapter(models.Model):
     next = models.IntegerField(default=0, blank=True,null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'chapter'
 
     def __str__(self):
@@ -28,7 +28,7 @@ class Chaptercomment(models.Model):
     comment = models.CharField(max_length=100)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'chaptercomment'
 
 class Chapterfile(models.Model):
@@ -45,6 +45,6 @@ class Chapterfile(models.Model):
         return self.filename
 
     class Meta:
-        managed = False
+        managed = True
         ordering = ['chapterid']
         db_table = 'chapterfile'

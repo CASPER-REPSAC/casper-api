@@ -7,13 +7,13 @@ from accounts.models import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('url', 'username', 'email', 'groups')
+        fields = ( 'username', 'email', 'groups')
 
 
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
-        fields = ('url', 'name')
+        fields = ( 'name')
 
 
 class ActivityParticipantSerializer(serializers.ModelSerializer):
@@ -25,7 +25,7 @@ class ActivityParticipantSerializer(serializers.ModelSerializer):
 class ActivityTagSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityTag
-        fields = ['url', 'id', 'activity_id', 'tag_id']
+        fields = [ 'id', 'activity_id', 'tag_id']
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -33,7 +33,7 @@ class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tag
-        fields = ['url', 'id', 'name', 'acti']
+        fields = [ 'id', 'name', 'acti']
 
 
 class Tag_IdSerializer(serializers.ModelSerializer):
@@ -57,5 +57,5 @@ class ActivitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Activity
-        fields = ['url', 'id', 'title', 'type', 'author', 'createDate', 'description',
+        fields = [ 'id', 'title', 'type', 'author', 'createDate', 'description',
                   'startDate', 'endDate', 'currentState', 'viewerNum', 'tags', 'participants']

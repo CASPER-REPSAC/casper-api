@@ -11,13 +11,14 @@ urlpatterns = [
 
     # GET, POST uri
 
-    path('api/w00/activities/', ActivityViewSet),
-    path('api/activities/type/<str:filter_type>', activity_list),
-    path('api/activities', activity_list),
-    path('api/activities/<int:pk>', activity_detail),
+    path('api/activities/', activity_list),
+    # 내쪽으로
+    # path('api/activities/type/<str:filter_type>', activity_list),
+
+    path('api/activities/<int:pk>/', activity_detail),
 
     # UPDATE uri
-    path('api/activities/<int:pk>/chapter/<int:chapterid>/update_chapter', chapter_update),
+    path('api/activities/<int:pk>/chapter/<int:chapterid>/update_chapter/', chapter_update),
 
     # DELETE uri
     path('api/activities/<int:pk>/chapter/<int:chapterid>', chapter_detail),
@@ -25,13 +26,15 @@ urlpatterns = [
 
     #Fileupload
     path('api/activities/<int:pk>/chapter/<int:chapterid>/upload/<str:filename>', FileView.as_view()), #
-    
+
     path('api/', include('activity.urls')),
 ]
 
 urlpatterns += [
     path('admin/', admin.site.urls),
     path('accounts/', include('dj_rest_auth.urls')),
+    path('accounts/registration', include('dj_rest_auth.registration.urls')),
     path('accounts/', include('allauth.urls')),
     path('accounts/', include('accounts.urls')),
+
 ]

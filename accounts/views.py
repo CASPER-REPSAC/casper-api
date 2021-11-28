@@ -15,7 +15,7 @@ from allauth.socialaccount.models import SocialAccount
 from .models import User
 
 
-BASE_URL = 'http://localhost:8000/'
+BASE_URL = 'http://api.w00.kr/'
 GOOGLE_CALLBACK_URI = BASE_URL + 'accounts/google/callback/'
 KAKAO_CALLBACK_URI = BASE_URL + 'accounts/kakao/callback/'
 GITHUB_CALLBACK_URI = BASE_URL + 'accounts/github/callback/'
@@ -44,7 +44,9 @@ def google_callback(request):
     token_req_json = token_req.json()
     error = token_req_json.get("error")
     if error is not None:
-        raise JSONDecodeError(error)
+        # raise JSONDecodeError(error)
+        print(error)
+
     access_token = token_req_json.get('access_token')
     """
     Email Request
