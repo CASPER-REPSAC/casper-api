@@ -45,5 +45,8 @@ class User(AbstractUser):
 
     objects = UserManager()
 
+    class Meta(AbstractUser.Meta):
+        managed = True
+        
     def __str__(self):
         return self.email

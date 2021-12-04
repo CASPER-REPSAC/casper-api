@@ -10,12 +10,12 @@ class Chapter(models.Model):
     modified_time = models.DateTimeField(auto_now=True)
     article = models.CharField(max_length=500)
     filepath = models.CharField(max_length=32, blank=True, null=True)
-    filesize = models.IntegerField(blank=True, null=True)
+    fileid = models.IntegerField(blank=True, null=True)
     last = models.IntegerField(default=0, blank=True,null=True)
     next = models.IntegerField(default=0, blank=True,null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'chapter'
 
     def __str__(self):
@@ -28,7 +28,7 @@ class Chaptercomment(models.Model):
     comment = models.CharField(max_length=100)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'chaptercomment'
 
 class Chapterfile(models.Model):
@@ -45,6 +45,6 @@ class Chapterfile(models.Model):
         return self.filename
 
     class Meta:
-        managed = False
+        managed = True
         ordering = ['chapterid']
         db_table = 'chapterfile'

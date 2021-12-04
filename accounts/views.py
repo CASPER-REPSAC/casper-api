@@ -1,5 +1,5 @@
 import requests
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.http import JsonResponse
@@ -12,13 +12,23 @@ from allauth.socialaccount.providers.kakao import views as kakao_view
 from allauth.socialaccount.providers.github import views as github_view
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from allauth.socialaccount.models import SocialAccount
+from rest_framework.views import APIView
+from rest_framework import status,generics
+from .serializers import *
+from rest_framework import permissions
 from .models import User
+#from django.core.exceptions import ValidationError
+#from connects import api
+#from django.views.decorators.csrf import csrf_exempt
+#from rest_framework_simplejwt.views import TokenRefreshView
 
-
-BASE_URL = 'http://127.0.0.1:8000/'
+BASE_URL = 'https://test.floodnut.com/'
+#BASE_URL = 'http://127.0.0.1:8001/'
 GOOGLE_CALLBACK_URI = BASE_URL + 'accounts/google/callback/'
 KAKAO_CALLBACK_URI = BASE_URL + 'accounts/kakao/callback/'
 GITHUB_CALLBACK_URI = BASE_URL + 'accounts/github/callback/'
+#GOOGLE_ACCESS_TOKEN_OBTAIN_URL = 'https://oauth2.googleapis.com/token' 
+#GOOGLE_USER_INFO_URL = 'https://www.googleapis.com/oauth2/v3/userinfo'
 
 state = getattr(settings, 'STATE')
 
@@ -33,6 +43,7 @@ def google_login(request):
 
 
 def google_callback(request):
+
     client_id = getattr(settings, "SOCIAL_AUTH_GOOGLE_CLIENT_ID")
     client_secret = getattr(settings, "SOCIAL_AUTH_GOOGLE_SECRET")
     code = request.GET.get('code')
@@ -42,16 +53,19 @@ def google_callback(request):
     token_req = requests.post(
         f"https://oauth2.googleapis.com/token?client_id={client_id}&client_secret={client_secret}&code={code}&grant_type=authorization_code&redirect_uri={GOOGLE_CALLBACK_URI}&state={state}")
     token_req_json = token_req.json()
+    #print(token_req_json)
     error = token_req_json.get("error")
     if error is not None:
-        #raise JSONDecodeError(error)
         print(error)
+        #raise JSONDecodeError(error)
+
     access_token = token_req_json.get('access_token')
     """
     Email Request
     """
     email_req = requests.get(
         f"https://www.googleapis.com/oauth2/v1/tokeninfo?access_token={access_token}")
+  
     email_req_status = email_req.status_code
     if email_req_status != 200:
         return JsonResponse({'err_msg': 'failed to get email'}, status=status.HTTP_400_BAD_REQUEST)
@@ -79,6 +93,7 @@ def google_callback(request):
         accept_json = accept.json()
         accept_json.pop('user', None)
         return JsonResponse(accept_json)
+
     except User.DoesNotExist:
         # 기존에 가입된 유저가 없으면 새로 가입
         data = {'access_token': access_token, 'code': code}
@@ -153,6 +168,7 @@ def kakao_callback(request):
         accept = requests.post(
             f"{BASE_URL}accounts/kakao/login/finish/", data=data)
         accept_status = accept.status_code
+        print(accept)
         if accept_status != 200:
             return JsonResponse({'err_msg': 'failed to signin'}, status=accept_status)
         accept_json = accept.json()
@@ -180,6 +196,7 @@ class KakaoLogin(SocialLoginView):
 
 def github_login(request):
     client_id = getattr(settings, 'SOCIAL_AUTH_GITHUB_KEY')
+    
     return redirect(
         f"https://github.com/login/oauth/authorize?client_id={client_id}&redirect_uri={GITHUB_CALLBACK_URI}"
     )
@@ -208,7 +225,7 @@ def github_callback(request):
     error = user_json.get("error")
     if error is not None:
         raise JSONDecodeError(error)
-    print(user_json)
+    #print(user_json)
     email = user_json.get("email")
     """
     Signup or Signin Request

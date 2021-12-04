@@ -5,9 +5,9 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
-User = get_user_model()
 from django.views.decorators.csrf import csrf_exempt
-
+from connects.utils import addTagName, addUserName
+User = get_user_model()
 
 class ActivityViewSet(viewsets.ModelViewSet):
     """

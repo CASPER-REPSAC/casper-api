@@ -2,6 +2,7 @@ from pathlib import Path
 from datetime import timedelta
 import os, json, sys
 
+from connects.middleware import *
 
 # json parse for key
 with open('connects/keys.json') as key_file:
@@ -26,11 +27,11 @@ ROOT_URLCONF = 'connects.urls'
 BASE_URL = default_base_url
 ROOT_DIR = os.path.dirname(BASE_DIR)
 STATE = default_state
-
+APPEND_SLASH = True
 
 # For Files
 MEDIA_ROOT = os.path.join(BASE_DIR, 'files')
-MEDIA_URL = './files/'
+MEDIA_URL = './'
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
 
 
@@ -40,14 +41,31 @@ SECRET_PATH = os.path.join(ROOT_DIR, '.footprint_secret')
 SECRET_BASE_FILE = os.path.join(BASE_DIR, '/connects/keys.json')
 SECRET_KEY = json_secret_key
 DEBUG = True
-ALLOWED_HOSTS = ['*', 'localhost', '127.0.0.1', ]
+ALLOWED_HOSTS = ['*']
 SOCIAL_AUTH_GOOGLE_CLIENT_ID = default_authid
 SOCIAL_AUTH_GOOGLE_SECRET = default_authsecret
-SITE_ID = default_siteid
+SITE_ID = 2 #default_siteid
+
+
+
+# Google configuration
+#SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = default_authid
+#SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = default_authsecret
+#SOCIAL_AUTH_USER_FIELDS=['email','first_name','username','password']
+## Define SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE to get extra permissions from Google.
+#SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
+#    'https://www.googleapis.com/auth/userinfo.email',
+#    'https://www.googleapis.com/auth/userinfo.profile',
+#]
+
+
 
 
 # Application definition
 INSTALLED_APPS = [
+    #CORS
+    'corsheaders', 
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -65,10 +83,13 @@ INSTALLED_APPS = [
     # api doc module
     # 'drf-yasg',
 
-    #CORS
-    'corsheaders', 
+    #SSL
+    #'sslserver',
+
     # django rest framework
     'rest_framework',
+    'rest_framework.authtoken',
+    'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     # dj-rest-auth
     'dj_rest_auth',
@@ -84,6 +105,7 @@ INSTALLED_APPS = [
 
 
 # JWT
+
 REST_USE_JWT = True
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),
@@ -96,31 +118,36 @@ SIMPLE_JWT = {
 # REST Settings
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
-        #'rest_framework.permissions.AllowAny',
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
+        #'rest_framework.permissions.IsAuthenticated',
     ),
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',
+        #'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
         'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+        #'oauth2_provider.contrib.rest_framework.OAuth2Authentication',  # django-oauth-toolkit >= 1.0.0
+        #'drf_social_oauth2.authentication.SocialAuthentication',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10
 }
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'connects.middleware.CORSMiddleware' ,
 ]
 
 
 # CORS
-CORS_ORIGIN_ALLOW_ALL=True
+CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True #전체 주소 허용 
 CORS_ALLOW_METHODS = (
     'DELETE',
@@ -142,10 +169,12 @@ CORS_ALLOW_HEADERS = (
     'x-requested-with',
 )
 # 특정 주소 허용 
-# CORS_ORIGIN_WHITELIST = (
-#     'www.mysite.com',
-#     'www.anothersite.com'
-# )
+#CORS_ORIGIN_WHITELIST = [
+#     'https://www.connects.casper.or.kr',
+#     'http://localhost:8080',
+#     'http://127.0.0.1:8080',
+#     'http://localhost',
+#]
 
 
 TEMPLATES = [
@@ -155,6 +184,8 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                #'social_django.context_processors.backends',
+                #'social_django.context_processors.login_redirect',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
@@ -163,6 +194,10 @@ TEMPLATES = [
         },
     },
 ]
+#TEMPLATE_CONTEXT_PROCESSORS = (
+#    'social_django.context_processors.backends',
+#    'social_django.context_processors.login_redirect',
+#)
 WSGI_APPLICATION = 'connects.wsgi.application'
 
 
@@ -216,6 +251,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # USE_X_FORWARDED_HOST = True
 STATIC_URL = '/static/'
+STATIC_DIR = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = [
+    STATIC_DIR,
+]
+STATIC_ROOT = os.path.join(ROOT_DIR, './casper-api/static_root/')
 
 
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None

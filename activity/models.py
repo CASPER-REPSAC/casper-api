@@ -28,7 +28,7 @@ class Activity(models.Model):
 
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'activity'
 
     def __str__(self):
@@ -39,7 +39,7 @@ class Tag(models.Model):
     name = models.CharField(max_length=50)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'tag'
 
     def __str__(self):
@@ -52,7 +52,7 @@ class ActivityTag(models.Model):
     tag_id = models.ForeignKey(Tag, related_name="acti", on_delete=models.CASCADE, db_column='tag_id')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'activity_tag'
 
     def __str__(self):
@@ -69,3 +69,4 @@ class ActivityParticipant(models.Model):
     class Meta:
         managed = True
         db_table = 'activity_participant'
+

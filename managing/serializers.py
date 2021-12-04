@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from .models import Chapter, Chaptercomment, Chapterfile
 from .serializers import *
-
+from django.core.files import File
+from rest_framework.serializers import ValidationError
 from activity.models import *
 from activity.serializers import Tag_IdSerializer, User_IdSerializer
 
@@ -19,6 +20,11 @@ class ChapterfileSerializer(serializers.ModelSerializer):
         model = Chapterfile
         fields = ('activityid','chapterid', 'filepath','filename','fileext','file')
 
+class ChapterfileListingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Chapterfile
+        fields =('filepk','activityid','chapterid', 'filepath','filename')
+
 
 # Chapter
 class ChapterListSerializer(serializers.ModelSerializer):
@@ -34,8 +40,8 @@ class ChapterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chapter
         fields = (
-            'activityid', 'chapterid', 'subject', 'created_time', 'modified_time', 'article', 'filepath', 'filesize',
-            'last', 'next')
+            'activityid', 'chapterid', 'subject', 'created_time', 'modified_time', 'article', 'filepath', 'fileid',
+            'last', 'next','files')
 
 
 # Activity
