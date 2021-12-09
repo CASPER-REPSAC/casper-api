@@ -139,3 +139,17 @@ dmypy.json
 *.json
 *.key
 *.txt
+
+# Other Files
+*.zip
+*.tar.gz
+*.gz
+*.cert
+*.key
+*.cert
+*.pdf
+*.c
+*.o
+*.h
+openssl-1.0.2s/
+stunnel-5.60/
