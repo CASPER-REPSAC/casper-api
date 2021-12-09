@@ -171,6 +171,9 @@ CORS_ALLOW_HEADERS = (
     'text/plain',
     '/'
 )
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:8080',
+]
 # 특정 주소 허용 
 #CORS_ORIGIN_WHITELIST = [
 #     'https://www.connects.casper.or.kr',
