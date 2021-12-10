@@ -42,17 +42,19 @@ class JWTValidation:
 
     def auth(self):
         t = self.decode_jwt()
-        if t :
-            return True
-        else :
+        if not t :
             return False
+        else :
+            return True
 
 
     def decode_jwt(self):
-        payload = jwt.decode(self.token, settings.SECRET_KEY, algorithms=["HS256"])
-
+        try:
+            payload = jwt.decode(self.token, settings.SECRET_KEY, algorithms=["HS256"])
+        except:
+            payload = False
+        
         if payload['pk'] is None:
-            raise err.AuthenticationFailed
+            payload = False
 
-        else:
-            return True 
+        return payload
