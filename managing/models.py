@@ -28,21 +28,21 @@ class Chapter(models.Model):
 class Chaptercomment(models.Model):
     commentpk = models.AutoField(primary_key=True)
     comment = models.CharField(max_length=100)
-    activityid = models.ForeignKey(Activity, models.DO_NOTHING, db_column='activityid')
-    chapterid = models.ForeignKey(Chapter, models.DO_NOTHING, db_column='chapterid')
+    activityid = models.ForeignKey(Activity, related_name='commentpk', db_column='activityid', on_delete=models.CASCADE)
+    chapterid = models.ForeignKey(Chapter, related_name='commentpk', db_column='chapterid', on_delete=models.CASCADE)
     createtime = models.DateTimeField()
-    writer = models.ForeignKey(User, models.DO_NOTHING, db_column='writer')
+    writer = models.ForeignKey(User, related_name='commentpk', db_column='writer', on_delete=models.CASCADE)
 
     class Meta:
         managed = True
+        ordering = ['createtime']
         db_table = 'chaptercomment'
 
 
 class Chapterfile(models.Model):
     filepk = models.AutoField(primary_key=True)
-    #activityid = models.IntegerField()
     activityid = models.ForeignKey(Activity, db_column='activityid', on_delete=models.CASCADE)
-    chapterid = models.ForeignKey(Chapter, models.DO_NOTHING, db_column='chapterid')
+    chapterid = models.ForeignKey(Chapter, db_column='chapterid', on_delete=models.CASCADE)
     filepath = models.CharField(max_length=64)
     filename = models.CharField(max_length=100)
     create_date = models.DateTimeField(auto_now_add=True)

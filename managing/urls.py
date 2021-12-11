@@ -19,6 +19,6 @@ urlpatterns = [
     path('<int:pk>/chapter/<int:chapterid>/download/<str:filename>/', getfile),
 
     #Comment
-    path('write_comment/', ChaptercommentViewSet.perform_create),
-    path('delete_comment/', ChaptercommentViewSet.perform_destroy),
+    path('write_comment/', write_comment),
+    path('delete_comment/<int:commentpk>', delete_comment),
 ]

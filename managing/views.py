@@ -27,6 +27,7 @@ from .models import Activity, Chapter, Chaptercomment, Chapterfile
 from .utils import RandomFileName 
 import uuid, collections
 
+
 @csrf_exempt
 @api_view(['GET', 'POST'])
 def activity_list(request):
@@ -139,28 +140,29 @@ def chapter_detail(request, pk, chapterid):
     if request.method == "GET":
         chapters = Chapter.objects.filter(activityid=pk,chapterid=chapterid)
         chapterfile = Chapterfile.objects.filter(activityid=pk,chapterid=chapterid).only("filepk","filepath","filename")
-        chaptercomment = Chaptercomment.objects.filter(activityid=pk,chapterid=chapterid)
+        chaptercomment = Chaptercomment.objects.filter(activityid=pk, chapterid=chapterid)
 
         fserializer = ChapterfileListingSerializer(chapterfile, many=True)
         serializer = ChapterSerializer(chapters, many=True)
-        cmtserializer = ChaptercommentSerializer(chaptercomment, many=True)
+        cmtserializer = ChaptercommentListSerializer(chaptercomment, many=True)
 
         #print(serializer.data)
         ret = list()
         ret.append(serializer.data[0])
         files = list()
         comments = list()
-        #returnDict = list(serializer.data[0])
-        #returnDict.append(fserializer.data)
+        returnDict = list(serializer.data[0])
+        returnDict.append(fserializer.data)
         for i in fserializer.data:
             files.append(dict(i))
         ret.append(files)
 
         for i in cmtserializer.data:
             comments.append(dict(i))
+            
         ret.append(comments)
-
         return Response(ret)
+        #return Response(serializer.data)
 
     elif request.method == "POST":
         serializer = ChapterSerializer(data=request.data)
@@ -294,6 +296,90 @@ def getfile(request, pk, chapterid, filename):
 
 
 
+class CommentView(APIView):
+    
+    def post(self,request):
+        try:
+            token = request.POST['access_token']
+            JWT = JWTValidation(token.split()[1])
+            pk = JWT.decode_jwt()
+            if not pk:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            else:
+                context={'request': request}
+                date = datetime.datetime.now()
+                serializer = ChaptercommentSerializer(data=request.data,createtime=date)
+                if serializer.is_valid(raise_exception=True):
+
+                    serializer.save(writer = pk['writer'])
+                    return Response(status=status.HTTP_201_CREATED)
+                else:
+                    return Response(status=status.HTTP_400_BAD_REQUEST) 
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+    def delete(self,request,**kargs):
+        if kargs.get('commentpk') is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            try:
+                token = request.POST['access_token']
+                JWT = JWTValidation(token.split()[1])
+                pk = JWT.decode_jwt()
+                if not pk:
+                    return Response(status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    context={'request': request}
+                    date = datetime.datetime.now()
+                    serializer = ChaptercommentSerializer(data=request.data,createtime=date)
+                    if serializer.is_valid(raise_exception=True):
+
+                        serializer.save(writer = pk['writer'])
+                        return Response(status=status.HTTP_201_CREATED)
+                    else:
+                        return Response(status=status.HTTP_400_BAD_REQUEST) 
+            except:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def write_comment(request):
+
+    try:
+        token = request.POST['access_token']
+        JWT = JWTValidation(token.split()[1])
+        pk = JWT.decode_jwt()
+        if not pk:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            context={'request': request}
+            date = datetime.datetime.now()
+            serializer = ChaptercommentSerializer(data=request.data,createtime=date)
+            if serializer.is_valid(raise_exception=True):
+
+                serializer.save(writer = pk['writer'])
+                return Response(status=status.HTTP_201_CREATED)
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST) 
+    except:
+        return Response(status=status.HTTP_400_BAD_REQUEST) 
+
+
+
+@api_view(['POST'])
+def delete_comment(request, commentpk):
+    try:
+        token = request.POST['access_token']
+        JWT = JWTValidation(token.split()[1])
+        pk = JWT.decode_jwt()
+        pk = True
+        if not pk:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            comment = Chaptercomment.objects.get(commentpk = commentpk)
+            comment.delete()
+            return Response(status=status.HTTP_200_OK)
+    except:
+        return Response(status=status.HTTP_400_BAD_REQUEST) 
 
 
 
@@ -310,33 +396,6 @@ class ChapterViewSet(viewsets.ModelViewSet):
 class ChaptercommentViewSet(viewsets.ModelViewSet):
     queryset = Chaptercomment.objects.all()
     serializer_class = ChaptercommentSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
-
-    def perform_create(self, serializer):
-
-        #토큰 검증 절차 추가
-        token = self.request.POST['access_token']
-        JWT = JWTValidation(token.split()[1])
-        pk = JWT.decode_jwt()
-
-        if not pk:
-            return Response(ChaptercommentSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            serializer.save(writer = pk['writer'])
-            return Response(status=status.HTTP_201_CREATED)
-    
-    def perform_destroy(self, serializer):
-
-        #토큰 검증 절차 추가
-        token = self.request.POST['access_token']
-        JWT = JWTValidation(token.split()[1])
-        pk = JWT.decode_jwt()
-
-        if not pk:
-            return Response(ChaptercommentSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            self.queryset.delete(writer = pk['writer'], commentpk = self.request.POST['commentpk'])
-            return Response(serializer.data, status=status.HTTP_200_OK)
 
 class ChapterfileViewSet(viewsets.ModelViewSet):
     queryset = Chapterfile.objects.all()

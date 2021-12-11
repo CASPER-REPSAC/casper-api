@@ -1,7 +1,7 @@
 from pathlib import Path
 from datetime import timedelta
 import os, json, sys
-from connects.middleware import *
+
 
 # json parse for key
 with open('connects/keys.json') as key_file:
@@ -40,7 +40,7 @@ SECRET_PATH = os.path.join(ROOT_DIR, '.footprint_secret')
 SECRET_BASE_FILE = os.path.join(BASE_DIR, 'connects/keys.json')
 SECRET_KEY = json_secret_key
 DEBUG = True
-ALLOWED_HOSTS = ['*','127.0.0.1:8000']
+ALLOWED_HOSTS = ['*']
 SOCIAL_AUTH_GOOGLE_CLIENT_ID = default_authid
 SOCIAL_AUTH_GOOGLE_SECRET = default_authsecret
 SITE_ID = 2 #default_siteid
@@ -128,8 +128,8 @@ SIMPLE_JWT = {
 # REST Settings
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
-        #'rest_framework.permissions.AllowAny',
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
+        #'rest_framework.permissions.IsAuthenticated',
     ),
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
