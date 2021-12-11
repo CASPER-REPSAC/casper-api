@@ -139,18 +139,26 @@ def chapter_detail(request, pk, chapterid):
     if request.method == "GET":
         chapters = Chapter.objects.filter(activityid=pk,chapterid=chapterid)
         chapterfile = Chapterfile.objects.filter(activityid=pk,chapterid=chapterid).only("filepk","filepath","filename")
+        chaptercomment = Chaptercomment.objects.filter(activityid=pk,chapterid=chapterid)
+
         fserializer = ChapterfileListingSerializer(chapterfile, many=True)
         serializer = ChapterSerializer(chapters, many=True)
-        
+        cmtserializer = ChaptercommentSerializer(chaptercomment, many=True)
+
         #print(serializer.data)
         ret = list()
         ret.append(serializer.data[0])
         files = list()
+        comments = list()
         #returnDict = list(serializer.data[0])
         #returnDict.append(fserializer.data)
         for i in fserializer.data:
             files.append(dict(i))
         ret.append(files)
+
+        for i in cmtserializer.data:
+            comments.append(dict(i))
+        ret.append(comments)
 
         return Response(ret)
 
@@ -278,7 +286,7 @@ def getfile(request, pk, chapterid, filename):
             response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
             return response
     else:
-        Response(status=status.HTTP_400_BAD_REQUEST)  
+        return Response(status=status.HTTP_400_BAD_REQUEST)  
     #file = Chapterfile.objects.filter(activityid = pk,chapterid = chapterid, filepath = filename)
     #validated['file'] = File(open('home/flood/casper-api/files/' + filename))
 
@@ -327,7 +335,7 @@ class ChaptercommentViewSet(viewsets.ModelViewSet):
         if not pk:
             return Response(ChaptercommentSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
-            self.queryset.delete(writer = pk['writer'])
+            self.queryset.delete(writer = pk['writer'], commentpk = self.request.POST['commentpk'])
             return Response(serializer.data, status=status.HTTP_200_OK)
 
 class ChapterfileViewSet(viewsets.ModelViewSet):

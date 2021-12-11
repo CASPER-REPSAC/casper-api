@@ -1,4 +1,5 @@
 from django.core.files import File
+from django.contrib.auth.models import User
 
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
@@ -8,13 +9,20 @@ from managing.serializers import *
 from activity.models import *
 from activity.serializers import Tag_IdSerializer, User_IdSerializer
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'email')
+
 
 # Comment
 class ChaptercommentSerializer(serializers.ModelSerializer):
+    user = UserSerializer(many=True, read_only=True)
+
     class Meta:
         model = Chaptercomment
-        fields = ('activityid', 'chapterid', 'commentpk', 'comment', 'writer','createtime')
-        read_only_fields = ['writer']
+        fields = ('activityid', 'chapterid', 'commentpk', 'comment', 'writer','createtime','user')
+        read_only_fields = ['writer','user']
 
 
 # Attachment
