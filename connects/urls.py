@@ -6,10 +6,6 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
-from managing.views import activity_detail, activity_list, chapter_detail, chapter_update, ChapterViewSet
-from managing.views import ActivityViewSet, FileView, APIView, getfile
-from accounts.views import *
-
 admin.autodiscover()
 
 
@@ -20,27 +16,12 @@ urlpatterns = [
     # path('api/w00/activities', activity_list),
     #path('api/w00/activities/', ActivityViewSet),
     #path('api/activities', activity_list),
-    path('api/activities/', activity_list),
-    path('api/activities/<int:pk>', activity_detail),
-    path('api/activities/<int:pk>/', activity_detail),
-
-    # UPDATE uri
-    path('api/activities/<int:pk>/chapter/<int:chapterid>/update_chapter/', chapter_update),
-
-    # DELETE uri
-    path('api/activities/<int:pk>/chapter/<int:chapterid>', chapter_detail),
-    path('api/activities/<int:pk>/chapter/<int:chapterid>/', chapter_detail),
-
-    #File
-    path('api/activities/<int:pk>/chapter/<int:chapterid>/upload/<str:filename>/', FileView.as_view()), #
-    path('api/activities/<int:pk>/chapter/<int:chapterid>/download/<str:filename>/', getfile),
-
-    #Comment
-    path('api/activities/write_comment/', ),
-    path('api/activities/delete_comment/', ),
-
+   
     #Activity
     path('api/w00/', include('activity.urls')),
+
+    #Chapter
+    path('api/activities/', include('managing.urls')),
 
     #JWT Verify
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

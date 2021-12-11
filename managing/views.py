@@ -14,9 +14,11 @@ from rest_framework.exceptions import ParseError
 from rest_framework.parsers import MultiPartParser, FormParser, FileUploadParser  # for file upload
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework import viewsets, serializers, status
 
 from django.conf import settings
+from connects.middleware import JWTValidation
 from connects.utils import addTagName, addUserName
 from activity.serializers import TagSerializer
 from activity.models import *
@@ -283,6 +285,10 @@ def getfile(request, pk, chapterid, filename):
     #return validated 
 
 
+
+
+
+
 class ActivityViewSet(viewsets.ModelViewSet):
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
@@ -296,7 +302,33 @@ class ChapterViewSet(viewsets.ModelViewSet):
 class ChaptercommentViewSet(viewsets.ModelViewSet):
     queryset = Chaptercomment.objects.all()
     serializer_class = ChaptercommentSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
+    def perform_create(self, serializer):
+
+        #토큰 검증 절차 추가
+        token = self.request.POST['access_token']
+        JWT = JWTValidation(token.split()[1])
+        pk = JWT.decode_jwt()
+
+        if not pk:
+            return Response(ChaptercommentSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            serializer.save(writer = pk['writer'])
+            return Response(status=status.HTTP_201_CREATED)
+    
+    def perform_destroy(self, serializer):
+
+        #토큰 검증 절차 추가
+        token = self.request.POST['access_token']
+        JWT = JWTValidation(token.split()[1])
+        pk = JWT.decode_jwt()
+
+        if not pk:
+            return Response(ChaptercommentSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            self.queryset.delete(writer = pk['writer'])
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
 class ChapterfileViewSet(viewsets.ModelViewSet):
     queryset = Chapterfile.objects.all()

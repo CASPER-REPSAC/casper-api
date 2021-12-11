@@ -1,8 +1,10 @@
-from rest_framework import serializers
-from .models import Chapter, Chaptercomment, Chapterfile
-from .serializers import *
 from django.core.files import File
+
+from rest_framework import serializers
 from rest_framework.serializers import ValidationError
+
+from managing.models import Chapter, Chaptercomment, Chapterfile
+from managing.serializers import *
 from activity.models import *
 from activity.serializers import Tag_IdSerializer, User_IdSerializer
 
@@ -11,7 +13,8 @@ from activity.serializers import Tag_IdSerializer, User_IdSerializer
 class ChaptercommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chaptercomment
-        fields = ('activityid', 'chapterid', 'commentpk', 'comment')
+        fields = ('activityid', 'chapterid', 'commentpk', 'comment', 'writer','createtime')
+        read_only_fields = ['writer']
 
 
 # Attachment
