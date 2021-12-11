@@ -17,23 +17,6 @@ class CORSMiddleware(object):
         response["Access-Control-Allow-Headers"] = "*"
         return response
 
-'''
-class TokenVerifySerializer(serializers.Serializer):
-    token = serializers.CharField()
-
-    def validate(self, attrs):
-        UntypedToken(attrs['token'])
-
-        return {}
-
-class TokenVerifyView(TokenViewBase):
-    """
-    Takes a token and indicates if it is valid.  This view provides no
-    information about a token's fitness for a particular use.
-    """
-    serializer_class = TokenVerifySerializer
-'''
-
 
 class JWTValidation:
 

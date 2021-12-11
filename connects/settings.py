@@ -1,7 +1,6 @@
 from pathlib import Path
 from datetime import timedelta
 import os, json, sys
-
 from connects.middleware import *
 
 # json parse for key
@@ -38,13 +37,13 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECURITY WARNING: don't run with debug turned on in production!
 SECRET_PATH = os.path.join(ROOT_DIR, '.footprint_secret')
-SECRET_BASE_FILE = os.path.join(BASE_DIR, '/connects/keys.json')
+SECRET_BASE_FILE = os.path.join(BASE_DIR, 'connects/keys.json')
 SECRET_KEY = json_secret_key
 DEBUG = True
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*','127.0.0.1:8000']
 SOCIAL_AUTH_GOOGLE_CLIENT_ID = default_authid
 SOCIAL_AUTH_GOOGLE_SECRET = default_authsecret
-SITE_ID = 4 #default_siteid
+SITE_ID = 2 #default_siteid
 
 
 
