@@ -1,11 +1,12 @@
 # from _typeshed import FileDescriptorLike
 import os, datetime, uuid, json
-
+from django.utils.decorators import method_decorator
 from django.shortcuts import redirect, render, get_list_or_404
 from django.http import HttpResponse, JsonResponse, QueryDict
 from django.utils.encoding import filepath_to_uri
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
+from django.core.files import File
 
 from rest_framework.utils.serializer_helpers import ReturnDict, ReturnList
 from rest_framework.decorators import api_view
@@ -13,41 +14,20 @@ from rest_framework.exceptions import ParseError
 from rest_framework.parsers import MultiPartParser, FormParser, FileUploadParser  # for file upload
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework import viewsets, serializers, status
 
-from connects import settings
+from django.conf import settings
+from connects.middleware import JWTValidation
+from connects.utils import addTagName, addUserName
 from activity.serializers import TagSerializer
 from activity.models import *
 from .serializers import *
 from .models import Activity, Chapter, Chaptercomment, Chapterfile
+from .utils import RandomFileName 
+import uuid, collections
 
-
-####start#####
-### 공사중 ###
-def addTagName(response_data):
-    tag_list = Tag.objects.all()
-    # post 로 생성할 때는 response_data 의 데이터 타입이 다름.
-    # get 으로 불러올 떄는 ReturnDict 가 list 로 묶여있어서 ReturnList 이 되나봄.
-    # 그래서 아래와 같이 따로 처리 해줌.
-    if type(response_data) == ReturnDict:
-        for o_idx, tag_id in enumerate(response_data['tags']):
-            response_data['tags'][o_idx]['tag_name'] = str(tag_list.get(pk=tag_id['tag_id']))
-    else:
-        for d_idx, _object in enumerate(response_data):
-            for o_idx, tag in enumerate(_object['tags']):
-                response_data[d_idx]['tags'][o_idx]['tag_name'] = str(tag_list.get(pk=tag['tag_id']))
-    # return response_data # 리턴이 없어도 serializer.data 가 수정됨.
-
-
-def addUserName(response_data):
-    user_list = AuthUser.objects.all()
-    for d_idx, _object in enumerate(response_data):
-        for o_idx, tag in enumerate(_object['participants']):
-            response_data[d_idx]['participants'][o_idx]['user_name'] = str(user_list.get(pk=tag['user_id']))
-    # return response_data # 리턴이 없어도 serializer.data 가 수정됨.
-######end#####
-
-
+@csrf_exempt
 @api_view(['GET', 'POST'])
 def activity_list(request):
     context = {'request': request}
@@ -57,11 +37,13 @@ def activity_list(request):
 
         ####start#####
         ### 공사중 ###
-        addTagName(serializer.data)
-        addUserName(serializer.data)
+        addTagName(serializer.data, Tag)
+        addUserName(serializer.data, User)
         ######end#####
 
         return Response(serializer.data)
+
+
 
     elif request.method == "POST":
         serializer = ActivityListSerializer(data=request.data, context=context)
@@ -82,13 +64,13 @@ def activity_list(request):
                 # 문제 발견, 태그 생성은 되는데 response 에 보이질 않음.
                 serializer = ActivityListSerializer(activity_instance, context=context)
                 # 시리얼라이저를 재정의해서 데이터를 다시가져오는 것으로 해결.
-                addTagName(serializer.data)
+                addTagName(serializer.data, Tag)
             ######end#####
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+@csrf_exempt
 @api_view(['GET', 'POST'])
 def activity_detail(request, pk):
     if request.method == "GET":
@@ -98,8 +80,8 @@ def activity_detail(request, pk):
 
         ####start#####
         ### 공사중 ###
-        addTagName(serializer.data)
-        addUserName(serializer.data)
+        addTagName(serializer.data, Tag)
+        addUserName(serializer.data,User)
         ######end#####
 
         return Response(serializer.data)
@@ -135,7 +117,7 @@ def activity_detail(request, pk):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     '''
 
-
+@csrf_exempt
 @api_view(['POST'])
 def chapter_update(request, pk, chapterid):
     update_chapter = Chapter.objects.get(chapterid=chapterid)
@@ -146,7 +128,7 @@ def chapter_update(request, pk, chapterid):
     update_chapter.save()
     return redirect('detail', update_chapter.chapterid)
 
-
+@csrf_exempt
 @api_view(['GET', 'POST','DELETE'])
 def chapter_detail(request, pk, chapterid):
     try:
@@ -156,8 +138,29 @@ def chapter_detail(request, pk, chapterid):
 
     if request.method == "GET":
         chapters = Chapter.objects.filter(activityid=pk,chapterid=chapterid)
+        chapterfile = Chapterfile.objects.filter(activityid=pk,chapterid=chapterid).only("filepk","filepath","filename")
+        chaptercomment = Chaptercomment.objects.filter(activityid=pk,chapterid=chapterid)
+
+        fserializer = ChapterfileListingSerializer(chapterfile, many=True)
         serializer = ChapterSerializer(chapters, many=True)
-        return Response(serializer.data)
+        cmtserializer = ChaptercommentSerializer(chaptercomment, many=True)
+
+        #print(serializer.data)
+        ret = list()
+        ret.append(serializer.data[0])
+        files = list()
+        comments = list()
+        #returnDict = list(serializer.data[0])
+        #returnDict.append(fserializer.data)
+        for i in fserializer.data:
+            files.append(dict(i))
+        ret.append(files)
+
+        for i in cmtserializer.data:
+            comments.append(dict(i))
+        ret.append(comments)
+
+        return Response(ret)
 
     elif request.method == "POST":
         serializer = ChapterSerializer(data=request.data)
@@ -212,33 +215,33 @@ def chapter_detail(request, pk, chapterid):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@method_decorator(csrf_exempt,name='dispatch')
 class FileView(APIView):
 
     parser_classes = (FileUploadParser,)
-
-    def post(self, request,filename, format=None, *args, **kwargs):
+    
+    def post(self, request, filename, format=None, *args, **kwargs):
 
         if 'file' not in request.FILES:
             raise ParseError("Empty content")
 
         f = request.FILES['file']
-        #print(f)
-        #print(dir(request))
-        #print(request.__dict__)
-
+        savedName = f.name.replace(" ","_")
+        ext = os.path.splitext(f.name)[1]
+        newFilename = "%s.%s" % (uuid.uuid4(), ext.replace(".",""))
         addAttr = request.data
-        #file_name = request.data['filename']
-        
-        #new_file_full_name = file_upload_path(file_name.name)
-        #file_path = '/'.join(new_file_full_name.split('/')[0:-1])
         date = datetime.datetime.now()
-        print(date, datetime.datetime.now())
-        #model Attr
+
+        destination = open(settings.MEDIA_ROOT + "/" + newFilename, 'wb+')
+        for chunk in f.chunks():
+            destination.write(chunk)
+        destination.close()  # File should be closed only after all chuns are added
+        
         addAttr['activityid'] = request.parser_context['kwargs']['pk']
         addAttr['chapterid'] = request.parser_context['kwargs']['chapterid']
-        addAttr['filepath'] = '/' #file_path
+        addAttr['filepath'] =  newFilename #file_path
         addAttr['filename'] = filename
-        addAttr['fileext'] = 'pdf' #os.path.splitext(file_name.name)[1]
+        addAttr['fileext'] = ext
         addAttr['create_date'] = date
         addAttr['file'] = f
         addAttrDict = QueryDict('', mutable=True)
@@ -248,12 +251,50 @@ class FileView(APIView):
         if fileSerializer.is_valid():
             
             fileSerializer.save()       
-            print(fileSerializer.data)
 
+            os.remove(settings.MEDIA_ROOT + "/" + savedName)
+ 
             return Response(status=status.HTTP_201_CREATED)
         else:
-            print(fileSerializer.errors)
+            os.remove(settings.MEDIA_ROOT + "/" + savedName)
+
             return Response(fileSerializer.errors, status=status.HTTP_400_BAD_REQUEST)   
+
+
+def getfile(request, pk, chapterid, filename):
+    file_path = os.path.join(settings.MEDIA_ROOT, filename)
+    #validated = dict()
+    
+    content_types = { 
+        "zip" : "application/zip",
+        "jpeg" :"image/jpeg",
+        "jpg" : "image/jpeg",
+        "pdf" : "application/pdf",
+        "ppt" :"application/vnd.ms-powerpoint",
+        "xls" :"application/vnd.ms-excel",
+        "7z" : "application/x-7z-compressed",
+        "gif" : "image/gif",
+        "others" :"application/octet-stream"
+        }
+    c = content_types["others"]
+    if filename.split(".")[1] in content_types:
+        c = content_types[filename.split(".")[1]]
+    
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type=c)
+            response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
+            return response
+    else:
+        return Response(status=status.HTTP_400_BAD_REQUEST)  
+    #file = Chapterfile.objects.filter(activityid = pk,chapterid = chapterid, filepath = filename)
+    #validated['file'] = File(open('home/flood/casper-api/files/' + filename))
+
+    #return validated 
+
+
+
+
 
 
 class ActivityViewSet(viewsets.ModelViewSet):
@@ -269,7 +310,33 @@ class ChapterViewSet(viewsets.ModelViewSet):
 class ChaptercommentViewSet(viewsets.ModelViewSet):
     queryset = Chaptercomment.objects.all()
     serializer_class = ChaptercommentSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
+    def perform_create(self, serializer):
+
+        #토큰 검증 절차 추가
+        token = self.request.POST['access_token']
+        JWT = JWTValidation(token.split()[1])
+        pk = JWT.decode_jwt()
+
+        if not pk:
+            return Response(ChaptercommentSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            serializer.save(writer = pk['writer'])
+            return Response(status=status.HTTP_201_CREATED)
+    
+    def perform_destroy(self, serializer):
+
+        #토큰 검증 절차 추가
+        token = self.request.POST['access_token']
+        JWT = JWTValidation(token.split()[1])
+        pk = JWT.decode_jwt()
+
+        if not pk:
+            return Response(ChaptercommentSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            self.queryset.delete(writer = pk['writer'], commentpk = self.request.POST['commentpk'])
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
 class ChapterfileViewSet(viewsets.ModelViewSet):
     queryset = Chapterfile.objects.all()

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from activity.models import *
-
+from accounts.models import User
 from django.contrib.auth.models import User, Group
 
 
