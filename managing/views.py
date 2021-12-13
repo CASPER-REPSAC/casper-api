@@ -7,6 +7,7 @@ from django.utils.encoding import filepath_to_uri
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.core.files import File
+from django.db.models import Q
 
 from rest_framework.utils.serializer_helpers import ReturnDict, ReturnList
 from rest_framework.decorators import api_view
@@ -381,6 +382,15 @@ def delete_comment(request, commentpk):
     except:
         return Response(status=status.HTTP_400_BAD_REQUEST) 
 
+
+@api_view(['GET'])
+def search_all(request, keyword):
+    search = {}
+    acti = Activity.objects.filter(Q(title__icontains=keyword) | Q(description__icontains=keyword)).distinct()
+    chapter = Activity.objects.filter(Q(article__icontains=keyword) | Q(subject__icontains=keyword)).distinct()
+    search['activities'] = acti
+    search['chapters'] = chapter
+    return search
 
 
 class ActivityViewSet(viewsets.ModelViewSet):
