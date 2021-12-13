@@ -385,12 +385,16 @@ def delete_comment(request, commentpk):
 
 @api_view(['GET'])
 def search_all(request, keyword):
-    search = {}
-    acti = Activity.objects.filter(Q(title__icontains=keyword) | Q(description__icontains=keyword)).distinct()
-    chapter = Activity.objects.filter(Q(article__icontains=keyword) | Q(subject__icontains=keyword)).distinct()
-    search['activities'] = acti
-    search['chapters'] = chapter
-    return search
+    try:
+        search = {}
+        acti = Activity.objects.filter(Q(title__icontains=keyword) | Q(description__icontains=keyword)).distinct()
+        chapter = Activity.objects.filter(Q(article__icontains=keyword) | Q(subject__icontains=keyword)).distinct()
+        search['activities'] = acti
+        search['chapters'] = chapter
+        #return search
+        return Response(search, status=status.HTTP_200_OK)
+    except:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class ActivityViewSet(viewsets.ModelViewSet):
