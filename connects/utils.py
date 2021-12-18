@@ -1,4 +1,8 @@
+from rest_framework import status
 from rest_framework.utils.serializer_helpers import ReturnDict
+from connects.middleware import JWTValidation
+from django.contrib.auth import get_user_model
+from rest_framework.response import Response
 
 
 def addTagName(response_data, Tag):
@@ -16,10 +20,23 @@ def addTagName(response_data, Tag):
     # return response_data # 리턴이 없어도 serializer.data 가 수정됨.
 
 
+# 새로운 버전의 addUserName 함수
 def addUserName(response_data, User):
     user_list = User.objects.all()
-    for d_idx, _object in enumerate(response_data):
-        for o_idx, tag in enumerate(_object['participants']):
-            response_data[d_idx]['participants'][o_idx]['user_name'] = str(user_list.get(pk=tag['user_id']))
-    # return response_data # 리턴이 없어도 serializer.data 가 수정됨.
-######end#####
+    if type(response_data) == ReturnDict:
+        for o_idx, user in enumerate(response_data['participants']):
+            response_data['participants'][o_idx]['user_name'] = str(user_list.get(pk=user['user_id']))
+    else:
+        for d_idx, _object in enumerate(response_data):
+            for o_idx, user in enumerate(_object['participants']):
+                response_data[d_idx]['participants'][o_idx]['user_name'] = str(user_list.get(pk=user['user_id']))
+
+
+def USER_AUTHORIZAION(request):
+    User = get_user_model()
+    try:
+        token = JWTValidation(request.META['HTTP_AUTHORIZATION'].split()[1])
+        authed = token.decode_jwt()
+        return User.objects.get(id=authed['user_id'])
+    except:
+        return Response('auth_error', status=status.HTTP_400_BAD_REQUEST)

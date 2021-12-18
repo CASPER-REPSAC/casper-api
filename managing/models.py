@@ -8,7 +8,7 @@ User = get_user_model()
 class Chapter(models.Model):
     activityid = models.ForeignKey(Activity, related_name='chapterid',db_column='activityid', on_delete=models.CASCADE)#related_name='chapterid', on_delete=models.CASCADE)
     chapterid = models.AutoField(primary_key=True)
-    subject = models.CharField(max_length=16)
+    subject = models.CharField(max_length=129)
     created_time = models.DateTimeField(auto_now_add=True)
     modified_time = models.DateTimeField(auto_now=True)
     article = models.CharField(max_length=500)

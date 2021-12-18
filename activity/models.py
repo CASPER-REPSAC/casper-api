@@ -5,7 +5,7 @@ from accounts.models import User
 # Create your models here.
 class Activity(models.Model):
     id = models.AutoField(primary_key=True)
-    title = models.CharField(max_length=50)
+    title = models.CharField(max_length=100)
     type_CHOICES = (
         ('CTF', 'CTF'),
         ('Study', 'Study'),
@@ -14,7 +14,7 @@ class Activity(models.Model):
     type = models.CharField(max_length=50, choices=type_CHOICES)
     author = models.CharField(max_length=50)
     createDate = models.DateField(db_column='createDate')
-    description = models.CharField(max_length=65)
+    description = models.CharField(max_length=1200)
     startDate = models.DateField(db_column='startDate')
     endDate = models.DateField(db_column='endDate')
     currentState_CHOICES = (
@@ -70,3 +70,16 @@ class ActivityParticipant(models.Model):
         managed = True
         db_table = 'activity_participant'
 
+class Social(models.Model):
+    id = models.AutoField(primary_key=True)
+    provider = models.CharField(max_length=30)
+    uid = models.CharField(max_length=191)
+    last_login = models.DateTimeField()
+    date_joined = models.DateTimeField()
+    extra_data = models.TextField()
+    user = models.ForeignKey(User, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'socialaccount_socialaccount'
+        unique_together = (('provider', 'uid'),)

@@ -1,13 +1,9 @@
-from django.core.files import File
-from django.contrib.auth.models import User
-
 from rest_framework import serializers
-from rest_framework.serializers import ValidationError
 
-from managing.models import Chapter, Chaptercomment, Chapterfile
-from managing.serializers import *
 from activity.models import *
 from activity.serializers import Tag_IdSerializer, User_IdSerializer
+from managing.models import Chapter, Chaptercomment, Chapterfile
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,31 +13,37 @@ class UserSerializer(serializers.ModelSerializer):
 
 # Comment
 class ChaptercommentListSerializer(serializers.ModelSerializer):
-
     user = UserSerializer(many=True, read_only=True)
 
     class Meta:
         model = Chaptercomment
-        fields = ('activityid', 'chapterid', 'commentpk', 'comment', 'writer','createtime','user')
-        #read_only_fields = ['writer']
+        fields = ('activityid', 'chapterid', 'commentpk', 'comment', 'writer', 'createtime', 'user')
+        # read_only_fields = ['writer']
+
 
 class ChaptercommentSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Chaptercomment
-        fields = ('activityid', 'chapterid', 'commentpk', 'comment', 'writer','createtime')
+        fields = ('activityid', 'chapterid', 'commentpk', 'comment', 'writer', 'createtime')
+
+
+class ChaptercommentWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Chaptercomment
+        fields = ('activityid', 'chapterid', 'commentpk', 'comment', 'writer')
 
 
 # Attachment
 class ChapterfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chapterfile
-        fields = ('activityid','chapterid', 'filepath','filename','fileext','file')
+        fields = ('activityid', 'chapterid', 'filepath', 'filename', 'fileext', 'file')
+
 
 class ChapterfileListingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chapterfile
-        fields =('filepk','activityid','chapterid', 'filepath','filename')
+        fields = ('filepk', 'activityid', 'chapterid', 'filepath', 'filename')
 
 
 # Chapter
@@ -52,7 +54,6 @@ class ChapterListSerializer(serializers.ModelSerializer):
 
 
 class ChapterSerializer(serializers.ModelSerializer):
-    
     files = ChapterfileSerializer(many=True, read_only=True)
     comments = ChaptercommentListSerializer(many=True, read_only=True)
 
@@ -60,7 +61,7 @@ class ChapterSerializer(serializers.ModelSerializer):
         model = Chapter
         fields = (
             'activityid', 'chapterid', 'subject', 'created_time', 'modified_time', 'article', 'filepath', 'fileid',
-            'last', 'next','files','comments')
+            'last', 'next', 'files', 'comments')
 
 
 # Activity
