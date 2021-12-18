@@ -13,7 +13,6 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import viewsets, status
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import ParseError
-from rest_framework.pagination import LimitOffsetPagination
 from django.core.paginator import Paginator, EmptyPage
 from rest_framework.parsers import FileUploadParser  # for file upload
 from rest_framework.response import Response
@@ -150,15 +149,13 @@ def chapter_detail(request, pk, chapterid):
         chapters = Chapter.objects.filter(activityid=pk, chapterid=chapterid)
         chapterfile = Chapterfile.objects.filter(activityid=pk, chapterid=chapterid).only("filepk", "filepath",
                                                                                           "filename")
+        # 챕터 파일 목록을 마지막만 불러와요?
         chaptercomment = Chaptercomment.objects.filter(activityid=pk, chapterid=chapterid)
-
         fserializer = ChapterfileListingSerializer(chapterfile, many=True)
         serializer = ChapterSerializer(chapters, many=True)
         cmtserializer = ChaptercommentListSerializer(chaptercomment, many=True)
 
-        # print(serializer.data)
-        ret = list()
-        ret.append(serializer.data[0])
+        ret = [serializer.data[0]]
         files = list()
         comments = list()
         returnDict = list(serializer.data[0])
@@ -166,10 +163,8 @@ def chapter_detail(request, pk, chapterid):
         for i in fserializer.data:
             files.append(dict(i))
         ret.append(files)
-
         for i in cmtserializer.data:
             comments.append(dict(i))
-
         ret.append(comments)
         return Response(ret)
         # return Response(serializer.data)
@@ -229,16 +224,18 @@ def chapter_detail(request, pk, chapterid):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+import re
+
+
 @method_decorator(csrf_exempt, name='dispatch')
 class FileView(APIView):
     parser_classes = (FileUploadParser,)
 
     def post(self, request, filename, format=None, *args, **kwargs):
-
         if 'file' not in request.FILES:
             raise ParseError("Empty content")
-
         f = request.FILES['file']
+
         savedName = f.name.replace(" ", "_")
         ext = os.path.splitext(f.name)[1]
         newFilename = "%s.%s" % (uuid.uuid4(), ext.replace(".", ""))
@@ -246,10 +243,21 @@ class FileView(APIView):
         date = datetime.datetime.now()
 
         destination = open(settings.MEDIA_ROOT + "/" + newFilename, 'wb+')
-        for chunk in f.chunks():
-            destination.write(chunk)
+        chucks = f.read()
+        pattern = re.compile(b"(?<=\r\n\r\n)[\s\S]*(?=\r\n------WebKitFormBoundary)", re.S)
+        # pattern = re.compile(b'\r\n\r\n[\s\S]+\r\n------WebKitFormBoundary', re.S)
+        data = re.search(pattern, chucks)
+        if data:
+            destination.write(data.group())
+        else:
+            destination.write(chucks)
         destination.close()  # File should be closed only after all chuns are added
 
+        # with open(settings.MEDIA_ROOT + "/" + newFilename, 'rb') as d_file:
+        #     str_text = d_file.read()
+        #     print(str_text)
+        #
+        #     print(data)
         addAttr['activityid'] = request.parser_context['kwargs']['pk']
         addAttr['chapterid'] = request.parser_context['kwargs']['chapterid']
         addAttr['filepath'] = newFilename  # file_path
@@ -259,18 +267,13 @@ class FileView(APIView):
         addAttr['file'] = f
         addAttrDict = QueryDict('', mutable=True)
         addAttrDict.update(addAttr)
-
         fileSerializer = ChapterfileSerializer(data=addAttrDict)
         if fileSerializer.is_valid():
-
             fileSerializer.save()
-
             os.remove(settings.MEDIA_ROOT + "/" + savedName)
-
             return Response(status=status.HTTP_201_CREATED)
         else:
             os.remove(settings.MEDIA_ROOT + "/" + savedName)
-
             return Response(fileSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -307,7 +310,6 @@ def getfile(request, pk, chapterid, filename):
 
 
 class CommentView(APIView):
-
     def post(self, request):
         try:
             token = request.POST['authorization']
@@ -342,7 +344,6 @@ class CommentView(APIView):
                     date = datetime.datetime.now()
                     serializer = ChaptercommentSerializer(data=request.data, createtime=date)
                     if serializer.is_valid(raise_exception=True):
-
                         serializer.save(writer=pk['writer'])
                         return Response(status=status.HTTP_201_CREATED)
                     else:
@@ -364,7 +365,6 @@ def write_comment(request):
             date = datetime.datetime.now()
             serializer = ChaptercommentSerializer(data=request.data, createtime=date)
             if serializer.is_valid(raise_exception=True):
-
                 serializer.save(writer=pk['writer'])
                 return Response(status=status.HTTP_201_CREATED)
             else:
