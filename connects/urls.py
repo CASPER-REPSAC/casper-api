@@ -20,7 +20,7 @@ urlpatterns = [
     
    
     #Search
-    path('api/search/<str:keyword>/', search_all),
+    path('api/search/', search_all),
 
     #test
     path('api/test/',tester),
