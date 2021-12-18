@@ -1,6 +1,18 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import *
+
+
+class MyTokenObtainPairSerializer(serializers.TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        # Add custom claims
+        token['email'] = user.email
+        
+        return token
 
 
 class CustomTokenRefreshSerializer(serializers.Serializer):

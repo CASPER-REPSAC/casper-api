@@ -2,7 +2,6 @@ from pathlib import Path
 from datetime import timedelta
 import os, json, sys
 
-from connects.middleware import *
 
 # json parse for key
 with open('connects/keys.json') as key_file:
@@ -38,13 +37,13 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECURITY WARNING: don't run with debug turned on in production!
 SECRET_PATH = os.path.join(ROOT_DIR, '.footprint_secret')
-SECRET_BASE_FILE = os.path.join(BASE_DIR, '/connects/keys.json')
+SECRET_BASE_FILE = os.path.join(BASE_DIR, 'connects/keys.json')
 SECRET_KEY = json_secret_key
 DEBUG = True
 ALLOWED_HOSTS = ['*']
 SOCIAL_AUTH_GOOGLE_CLIENT_ID = default_authid
 SOCIAL_AUTH_GOOGLE_SECRET = default_authsecret
-SITE_ID = 4 #default_siteid
+SITE_ID = 2 #default_siteid
 
 
 
@@ -64,7 +63,7 @@ SITE_ID = 4 #default_siteid
 # Application definition
 INSTALLED_APPS = [
     #CORS
-    'corsheaders', 
+    'corsheaders',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -105,13 +104,24 @@ INSTALLED_APPS = [
 
 
 # JWT
-
 REST_USE_JWT = True
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
+
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
+
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
 }
 
 
@@ -123,14 +133,16 @@ REST_FRAMEWORK = {
     ),
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        #'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
-        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        #'rest_framework.authentication.BasicAuthentication',
+        #'rest_framework_simplejwt.authentication.JWTAuthentication',
+        #'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
         #'oauth2_provider.contrib.rest_framework.OAuth2Authentication',  # django-oauth-toolkit >= 1.0.0
         #'drf_social_oauth2.authentication.SocialAuthentication',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10
+    # 'DEFAULT_PAGINATION_CLASS': 'apps.core.pagination.StandardResultsSetPagination',
+    'PAGE_SIZE': 51
 }
 
 MIDDLEWARE = [
@@ -171,9 +183,6 @@ CORS_ALLOW_HEADERS = (
     'text/plain',
     '/'
 )
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:8080',
-]
 # 특정 주소 허용 
 #CORS_ORIGIN_WHITELIST = [
 #     'https://www.connects.casper.or.kr',
@@ -210,7 +219,7 @@ WSGI_APPLICATION = 'connects.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 AUTH_USER_MODEL = 'accounts.User'
-DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+# DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 DATABASES = {
     'default': {
         'ENGINE': default_ENGINE,
@@ -255,7 +264,7 @@ USE_TZ = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_HOST = True
 STATIC_URL = '/static/'
 STATIC_DIR = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [
