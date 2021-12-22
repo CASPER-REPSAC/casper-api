@@ -36,7 +36,7 @@ class JWTValidation:
         except:
             payload = False
         
-        if payload['pk'] is None:
+        if payload['user_id'] is None:
             payload = False
 
         return payload

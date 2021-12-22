@@ -14,11 +14,11 @@ urlpatterns = [
     path('<int:pk>/chapter/<int:chapterid>', chapter_detail),
     path('<int:pk>/chapter/<int:chapterid>/', chapter_detail),
 
-    #File
-    path('<int:pk>/chapter/<int:chapterid>/upload/<str:filename>/', FileView.as_view()), #
+    # File
+    path('<int:pk>/chapter/<int:chapterid>/upload/<str:filename>/', FileView.as_view()),  #
     path('<int:pk>/chapter/<int:chapterid>/download/<str:filename>/', getfile),
 
-    #Comment
+    # Comment
     path('write_comment/', write_comment),
     path('delete_comment/<int:commentpk>', delete_comment),
 ]

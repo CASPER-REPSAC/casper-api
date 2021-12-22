@@ -12,7 +12,7 @@ class Activity(models.Model):
         ('Project', 'Project'),
     )
     type = models.CharField(max_length=50, choices=type_CHOICES)
-    author = models.CharField(max_length=50)
+    author = models.ForeignKey(User, related_name="user_id", on_delete=models.CASCADE, db_column="author")
     createDate = models.DateField(db_column='createDate')
     description = models.CharField(max_length=65)
     startDate = models.DateField(db_column='startDate')

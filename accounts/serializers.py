@@ -11,7 +11,7 @@ class MyTokenObtainPairSerializer(serializers.TokenObtainPairSerializer):
 
         # Add custom claims
         token['email'] = user.email
-        
+
         return token
 
 
@@ -23,6 +23,8 @@ class CustomTokenRefreshSerializer(serializers.Serializer):
         data = {'access_token': str(refresh.access_token)}
 
         return data
+
+
 '''
 class RegistrationSerializer(serializers.ModelSerializer):
    class Meta:
@@ -36,10 +38,10 @@ class RegistrationSerializer(serializers.ModelSerializer):
            instance.set_password(password)
        instance.save()
        return instance
+'''
 
 
-class UsersSerializer(serializers.ModelSerializer):
+class UsersSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model=User
-        fields=('email','username','first_name')
-        '''
+        model = User
+        fields = ('url', 'id', 'email')

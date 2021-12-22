@@ -5,6 +5,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+from managing.views import tester, search_all
 
 admin.autodiscover()
 
@@ -16,7 +17,14 @@ urlpatterns = [
     # path('api/w00/activities', activity_list),
     #path('api/w00/activities/', ActivityViewSet),
     #path('api/activities', activity_list),
+    
    
+    #Search
+    path('api/search/', search_all),
+
+    #test
+    path('api/test/',tester),
+
     #Activity
     path('api/w00/', include('activity.urls')),
 
