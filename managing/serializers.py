@@ -70,7 +70,7 @@ class ActivityListSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Activity
-        fields = ('id', 'title', 'type', 'author', 'createDate', 'description',
+        fields = ('url', 'id', 'title', 'type', 'author', 'createDate', 'description',
                   'startDate', 'endDate', 'currentState', 'viewerNum', 'tags', 'participants')
 
 
@@ -81,11 +81,5 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Activity
-        fields = ('id', 'title', 'type', 'author', 'createDate', 'description',
+        fields = ('url', 'id', 'title', 'type', 'author', 'createDate', 'description',
                   'startDate', 'endDate', 'currentState', 'viewerNum', 'tags', 'participants', 'chapterid')
-
-# class SearchSerializer(serializers.ModelSerializer):
-#     class Meta:
-#     model =
-#     pass
-

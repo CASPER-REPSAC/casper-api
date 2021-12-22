@@ -63,7 +63,7 @@ SITE_ID = 2 #default_siteid
 # Application definition
 INSTALLED_APPS = [
     #CORS
-    'corsheaders',
+    'corsheaders', 
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -135,14 +135,13 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
         #'rest_framework.authentication.BasicAuthentication',
-        #'rest_framework_simplejwt.authentication.JWTAuthentication',
-        #'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
         #'oauth2_provider.contrib.rest_framework.OAuth2Authentication',  # django-oauth-toolkit >= 1.0.0
         #'drf_social_oauth2.authentication.SocialAuthentication',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    # 'DEFAULT_PAGINATION_CLASS': 'apps.core.pagination.StandardResultsSetPagination',
-    'PAGE_SIZE': 3
+    'PAGE_SIZE': 10
 }
 
 MIDDLEWARE = [
@@ -183,6 +182,9 @@ CORS_ALLOW_HEADERS = (
     'text/plain',
     '/'
 )
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:8080',
+]
 # 특정 주소 허용 
 #CORS_ORIGIN_WHITELIST = [
 #     'https://www.connects.casper.or.kr',
@@ -219,7 +221,7 @@ WSGI_APPLICATION = 'connects.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 AUTH_USER_MODEL = 'accounts.User'
-# DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 DATABASES = {
     'default': {
         'ENGINE': default_ENGINE,
@@ -264,7 +266,7 @@ USE_TZ = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-USE_X_FORWARDED_HOST = True
+# USE_X_FORWARDED_HOST = True
 STATIC_URL = '/static/'
 STATIC_DIR = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [

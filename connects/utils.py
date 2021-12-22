@@ -1,5 +1,5 @@
 from rest_framework.utils.serializer_helpers import ReturnDict
-import json
+
 
 def addTagName(response_data, Tag):
     tag_list = Tag.objects.all()
@@ -22,10 +22,4 @@ def addUserName(response_data, User):
         for o_idx, tag in enumerate(_object['participants']):
             response_data[d_idx]['participants'][o_idx]['user_name'] = str(user_list.get(pk=tag['user_id']))
     # return response_data # 리턴이 없어도 serializer.data 가 수정됨.
-
-
 ######end#####
-
-
-
-

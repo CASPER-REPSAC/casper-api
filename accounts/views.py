@@ -1,4 +1,4 @@
-import json, time
+import json
 import requests
 from django.shortcuts import redirect
 from django.conf import settings
@@ -17,8 +17,7 @@ from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from allauth.socialaccount.models import SocialAccount
 from .models import User
 
-# BASE_URL = 'http://api.w00.kr/'
-BASE_URL = 'http://localhost:8000/'
+BASE_URL = 'http://api.w00.kr/'
 GOOGLE_CALLBACK_URI = BASE_URL + 'accounts/google/callback/'
 KAKAO_CALLBACK_URI = BASE_URL + 'accounts/kakao/callback/'
 GITHUB_CALLBACK_URI = BASE_URL + 'accounts/github/callback/'
@@ -79,7 +78,7 @@ def access_token_receive(request):
             return JsonResponse({'err_msg': 'failed to signin'}, status=accept_status)
         accept_json = accept.json()
         # accept_json.pop('user', None)
-        #print("Account Info Exist")
+        #print("계정 정보 있음")
         return JsonResponse(accept_json)
     except User.DoesNotExist:
         # 기존에 가입된 유저가 없으면 새로 가입
@@ -91,7 +90,7 @@ def access_token_receive(request):
             return JsonResponse({'err_msg': 'failed to signup'}, status=accept_status)
         accept_json = accept.json()
         # accept_json.pop('user', None)
-        #print("Account Info is not Exist")
+        #print("계정 정보 없음")
         return JsonResponse(accept_json)
 
 
@@ -112,7 +111,6 @@ def google_callback(request):
     """
         Email Request
         """
-    time.sleep(1)
     email_req = requests.get(
         f"https://www.googleapis.com/oauth2/v1/tokeninfo?access_token={access_token}")
     email_req_status = email_req.status_code
@@ -144,7 +142,6 @@ def google_callback(request):
         return JsonResponse(accept_json)
     except User.DoesNotExist:
         # 기존에 가입된 유저가 없으면 새로 가입
-        time.sleep(1)
         data = {'access_token': access_token, 'code': code}
         accept = requests.post(
             f"{BASE_URL}accounts/google/login/finish/", data=data)
@@ -273,7 +270,7 @@ def github_callback(request):
     error = user_json.get("error")
     if error is not None:
         raise JSONDecodeError(error)
-    #print(user_json)
+    print(user_json)
     email = user_json.get("email")
     """
     Signup or Signin Request
