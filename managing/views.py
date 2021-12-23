@@ -428,6 +428,7 @@ class CommentView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self,request,**kargs):
+        
         if kargs.get('commentpk') is None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
