@@ -45,4 +45,4 @@ class RegistrationSerializer(serializers.ModelSerializer):
 class UsersSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('email')  # , 'username', '')
+        fields = ('id', 'email')  # , 'username', '')

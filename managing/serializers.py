@@ -27,9 +27,10 @@ class ChaptercommentListSerializer(serializers.ModelSerializer):
 
 class ChaptercommentSerializer(serializers.ModelSerializer):
 
+    user = UserSerializer(many=True, read_only=True)
     class Meta:
         model = Chaptercomment
-        fields = ('activityid', 'chapterid', 'commentpk', 'comment', 'writer','createtime')
+        fields = ('activityid', 'chapterid', 'commentpk', 'comment', 'writer','createtime', 'user')
 
 
 # Attachment
@@ -55,16 +56,19 @@ class ChapterSerializer(serializers.ModelSerializer):
     
     files = ChapterfileSerializer(many=True, read_only=True)
     comments = ChaptercommentListSerializer(many=True, read_only=True)
-
+    user = UserSerializer(many=True, read_only=True)
+    userid = User_IdSerializer(many=True, read_only=True)
     class Meta:
         model = Chapter
         fields = (
             'activityid', 'chapterid', 'subject', 'created_time', 'modified_time', 'article', 'filepath', 'fileid',
-            'last', 'next','files','comments')
+            'last', 'next','files','comments','user','userid')
 
 
 # Activity
 class ActivityListSerializer(serializers.HyperlinkedModelSerializer):
+
+    author = serializers.PrimaryKeyRelatedField(read_only = True, many=True)
     tags = Tag_IdSerializer(many=True, read_only=True)
     participants = User_IdSerializer(many=True, read_only=True)
 
@@ -75,11 +79,12 @@ class ActivityListSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ActivitySerializer(serializers.HyperlinkedModelSerializer):
-    tags = Tag_IdSerializer(many=True, read_only=True)
+    author = serializers.PrimaryKeyRelatedField(read_only=True)
     participants = User_IdSerializer(many=True, read_only=True)
     chapterid = ChapterListSerializer(many=True, read_only=True)
 
     class Meta:
         model = Activity
         fields = ('url', 'id', 'title', 'type', 'author', 'createDate', 'description',
-                  'startDate', 'endDate', 'currentState', 'viewerNum', 'tags', 'participants', 'chapterid')
+                  'startDate', 'endDate', 'currentState', 'viewerNum','tags', 'participants', 'chapterid')
+        #read_only_fields = ('author',)

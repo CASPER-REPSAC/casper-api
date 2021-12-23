@@ -47,14 +47,17 @@ class User_IdSerializer(serializers.ModelSerializer):
 
 
 class ActivitySerializer(serializers.ModelSerializer):
+
+    #author = User_IdSerializer(many = True)
+    #tags = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    #participants = serializers.PrimaryKeyRelatedField(many = True, read_only=True)
     tags = Tag_IdSerializer(many=True, read_only=True)
     participants = User_IdSerializer(many=True, read_only=True)
 
     class Meta:
         model = Activity
         fields = ['url', 'id', 'title', 'type', 'author', 'createDate', 'description',
-                  'startDate', 'endDate', 'currentState', 'viewerNum', 'tags', 'participants']
-
+                  'startDate', 'endDate', 'currentState', 'viewerNum','tags', 'participants']
 
 class Acti_IdSerializer(serializers.ModelSerializer):
     # < 현재테이블 >.< FK인user컬럼 >.< 역참조관계명 >.all()

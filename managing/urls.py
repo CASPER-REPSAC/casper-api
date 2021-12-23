@@ -22,5 +22,5 @@ urlpatterns = [
 
     # Comment
     path('write_comment/', write_comment),
-    path('delete_comment/<int:commentpk>', delete_comment),
+    path('delete_comment/<int:commentpk>/', delete_comment),
 ]

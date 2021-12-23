@@ -1,6 +1,6 @@
 from django.db import models
 from accounts.models import User
-
+from django.contrib.auth import get_user_model
 
 # Create your models here.
 class Activity(models.Model):
@@ -12,7 +12,7 @@ class Activity(models.Model):
         ('Project', 'Project'),
     )
     type = models.CharField(max_length=50, choices=type_CHOICES)
-    author = models.CharField(max_length=50)
+    author = models.ForeignKey(User, related_name="user", on_delete=models.CASCADE, db_column='author'),
     createDate = models.DateField(db_column='createDate')
     description = models.CharField(max_length=65)
     startDate = models.DateField(db_column='startDate')
@@ -26,13 +26,15 @@ class Activity(models.Model):
                                                choices=currentState_CHOICES)
     viewerNum = models.PositiveIntegerField(db_column='viewerNum', default=0)
 
-
     class Meta:
         managed = True
         db_table = 'activity'
+        ordering = ['-id']
 
     def __str__(self):
         return self.title
+
+
 
 
 class Tag(models.Model):
@@ -48,7 +50,7 @@ class Tag(models.Model):
 
 # Activity 와 Tag 관계 테이블
 class ActivityTag(models.Model):
-    activity_id = models.ForeignKey(Activity, related_name="tags", on_delete=models.CASCADE,db_column="activity_id")
+    activity_id = models.ForeignKey(Activity, related_name="tags", on_delete=models.CASCADE, db_column="activity_id")
     tag_id = models.ForeignKey(Tag, related_name="acti", on_delete=models.CASCADE, db_column='tag_id')
 
     class Meta:
@@ -57,7 +59,6 @@ class ActivityTag(models.Model):
 
     def __str__(self):
         return f"{self.activity_id} >-< {self.tag_id}"
-
 
 
 # Activity 와 User 관계 테이블
@@ -70,8 +71,8 @@ class ActivityParticipant(models.Model):
         managed = True
         db_table = 'activity_participant'
 
-class Social(models.Model):
-    id = models.AutoField(primary_key=True)
+
+class SocialaccountSocialaccount(models.Model):
     provider = models.CharField(max_length=30)
     uid = models.CharField(max_length=191)
     last_login = models.DateTimeField()

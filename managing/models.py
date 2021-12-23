@@ -30,8 +30,8 @@ class Chaptercomment(models.Model):
     comment = models.CharField(max_length=100)
     activityid = models.ForeignKey(Activity, related_name='commentpk', db_column='activityid', on_delete=models.CASCADE)
     chapterid = models.ForeignKey(Chapter, related_name='commentpk', db_column='chapterid', on_delete=models.CASCADE)
-    createtime = models.DateTimeField()
-    writer = models.ForeignKey(User, related_name='commentpk', db_column='writer', on_delete=models.CASCADE)
+    createtime = models.DateTimeField(auto_now_add=True)
+    writer = models.ForeignKey(User, related_name='commenter', db_column='writer', on_delete=models.CASCADE)
 
     class Meta:
         managed = True

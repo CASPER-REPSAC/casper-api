@@ -19,7 +19,7 @@ urlpatterns = [
     #path('api/activities', activity_list),
    
     #Search
-    path('api/search/<str:keyword>/',search_all),
+    path('api/search/',search_all),
 
     #Activity
     path('api/w00/', include('activity.urls')),
