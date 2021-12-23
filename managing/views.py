@@ -1,5 +1,5 @@
 # from _typeshed import FileDescriptorLike
-import os, datetime, uuid, json
+import os, datetime, uuid, json, re
 from django.utils.decorators import method_decorator
 from django.shortcuts import redirect, render, get_list_or_404
 from django.http import HttpResponse, JsonResponse, QueryDict
@@ -18,14 +18,16 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework import viewsets, serializers, status
 
+from django.core.paginator import Paginator, EmptyPage
 from django.conf import settings
 from connects.middleware import JWTValidation
 from connects.utils import addTagName, addUserName
 from activity.serializers import TagSerializer
 from activity.models import *
+from accounts.models import *
 from .serializers import *
 from .models import Activity, Chapter, Chaptercomment, Chapterfile
-from .utils import RandomFileName 
+from .utils import RandomFileName
 import uuid, collections
 
 
@@ -48,10 +50,19 @@ def activity_list(request):
 
 
     elif request.method == "POST":
+        try:
+            authori = request.META['HTTP_AUTHORIZATION']
+            token = JWTValidation(request.META['HTTP_AUTHORIZATION'].split()[1])
+            authed = token.decode_jwt()
+            user_instance = User.objects.get(id=authed['user_id'])#.only("first_name","last_name")
+        #print(request.POST)
+        #print(author_[0])
+        except:
+            print("here")
+            return Response('auth_error', status=status.HTTP_400_BAD_REQUEST)
         serializer = ActivityListSerializer(data=request.data, context=context)
         if serializer.is_valid(raise_exception=True):
-            serializer.save()
-
+            serializer.save(author = user_instance)
             ####start#####
             ### 공사중 ###
             if 'tags' in request.data:
@@ -63,6 +74,7 @@ def activity_list(request):
                         Tag(name=r_tag).save()
                     tag_instance = Tag.objects.get(name=r_tag)  # 태그 인스턴스 찾아옴
                     ActivityTag(activity_id=activity_instance, tag_id=tag_instance).save()  # activity 랑 tag 연결
+                ActivityParticipant(activity_id=activity_instance, user_id=user_instance).save() # activity 랑 작성자 연결
                 # 문제 발견, 태그 생성은 되는데 response 에 보이질 않음.
                 serializer = ActivityListSerializer(activity_instance, context=context)
                 # 시리얼라이저를 재정의해서 데이터를 다시가져오는 것으로 해결.
@@ -89,6 +101,22 @@ def activity_detail(request, pk):
         return Response(serializer.data)
 
     elif request.method == "POST":
+
+        try:
+            authori = request.META['HTTP_AUTHORIZATION']
+            token = JWTValidation(request.META['HTTP_AUTHORIZATION'].split()[1])
+            authed = token.decode_jwt()
+
+            
+            user_instance = User.objects.get(id=authed['user_id'])
+            acti = Activity.objects.get(id = pk, author = user_instance)
+
+            if acti is None:
+                return Response('auth_error', status=status.HTTP_400_BAD_REQUEST)
+
+        except:
+            return Response('auth_error', status=status.HTTP_400_BAD_REQUEST)
+
         context={'request': request}
         serializer = ChapterSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
@@ -103,7 +131,7 @@ def activity_detail(request, pk):
             else:
                 serializer.save(next = chapterNow.chapterid)
                 chapterLast.next = chapterNow.chapterid
-            chapterLast.save()
+                chapterLast.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -122,13 +150,58 @@ def activity_detail(request, pk):
 @csrf_exempt
 @api_view(['POST'])
 def chapter_update(request, pk, chapterid):
+
+    try:
+        token = JWTValidation(request.META['HTTP_AUTHORIZATION'].split()[1])
+        authed = token.decode_jwt()
+
+        acti = Activity.objects.get(id = pk)
+        user = User.objects.get(id = authed['user_id'])
+        #print(acti.author)
+        #print(len(acti.author))
+        #print(user.email)
+        #print(len(user.email))
+
+        if (acti.author).strip() != (user.email).strip():
+            #print('chapter_up')
+            return Response('auth_error', status=status.HTTP_400_BAD_REQUEST)
+        
+    except:
+        #print("chapterupdate_here1")
+        return Response('auth_error', status=status.HTTP_400_BAD_REQUEST)
+
+    
+    if request.data['file_delete'] is not None:
+        delete_f = request.data['file_delete']
+
+        if len(delete_f) == 3:
+            delete_ = Chapterfile.objects.filter(Q(filepath = delete_f[0])| Q(filepath = delete_f[1]) | Q(filepath = delete_f[2]) )
+            delete_.delete()
+            os.remove(settings.MEDIA_ROOT + "/" + delete_f[0])
+            os.remove(settings.MEDIA_ROOT + "/" + delete_f[1])
+            os.remove(settings.MEDIA_ROOT + "/" + delete_f[2])
+        elif len(delete_f) == 2:
+            delete_ = Chapterfile.objects.filter(Q(filepath = delete_f[0])| Q(filepath = delete_f[1]))
+            delete_.delete()
+            os.remove(settings.MEDIA_ROOT + "/" + delete_f[0])
+            os.remove(settings.MEDIA_ROOT + "/" + delete_f[1])
+        elif len(delete_f) == 1:
+            delete_ = Chapterfile.objects.filter(Q(filepath = delete_f[0]))
+            delete_.delete()
+            os.remove(settings.MEDIA_ROOT + "/" + delete_f[0])
+
+        else:
+            pass
+
+ 
+        
     update_chapter = Chapter.objects.get(chapterid=chapterid)
-    update_chapter.subject = request.POST['subject']
-    update_chapter.article = request.POST['article']
+    update_chapter.subject = request.data['subject']
+    update_chapter.article = request.data['article']
     # update_chapter.subject = request.POST['subject']
 
     update_chapter.save()
-    return redirect('detail', update_chapter.chapterid)
+    return Response(status=status.HTTP_200_OK)
 
 @csrf_exempt
 @api_view(['GET', 'POST','DELETE'])
@@ -160,12 +233,13 @@ def chapter_detail(request, pk, chapterid):
 
         for i in cmtserializer.data:
             comments.append(dict(i))
-            
+
         ret.append(comments)
         return Response(ret)
         #return Response(serializer.data)
 
     elif request.method == "POST":
+
         serializer = ChapterSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             chapterLast = Chapter.objects.filter(activityid = pk).order_by('chapterid').last()
@@ -190,6 +264,24 @@ def chapter_detail(request, pk, chapterid):
     #        return Response(serializer.data)
 
     elif request.method == "DELETE":
+
+        try:
+            token = JWTValidation(request.META['HTTP_AUTHORIZATION'].split()[1])
+            authed = token.decode_jwt()
+
+            acti = Activity.objects.get(id = pk)
+            user = User.objects.get(id = authed['user_id'])
+
+
+            if acti.author != user.email:
+                #print('chapter_up')
+                return Response('auth_error', status=status.HTTP_400_BAD_REQUEST)
+        
+        except:
+            #print("chapterupdate_here1")
+            return Response('auth_error', status=status.HTTP_400_BAD_REQUEST)
+
+
         #chapters = Chapter.objects.filter(activityid=pk)
         #serializer = ChapterSerializer(data=request.data)
         #print(dir(Chapter.objects))
@@ -200,7 +292,10 @@ def chapter_detail(request, pk, chapterid):
         #serializerNext = ChapterSerializer(data=chapterNext.__dict__)
 
         #print(dir(serializerNext))
-        if chapterNext is None:#and serializerLast.is_valid(raise_exception=True):
+        if (chapterNext is None) and (chapterLast is None):
+            pass
+
+        elif (chapterNext is None):#and serializerLast.is_valid(raise_exception=True):
             chapterLast.next = 0
             chapterLast.save()
 
@@ -218,57 +313,70 @@ def chapter_detail(request, pk, chapterid):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@method_decorator(csrf_exempt,name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
 class FileView(APIView):
-
     parser_classes = (FileUploadParser,)
-    
+
     def post(self, request, filename, format=None, *args, **kwargs):
+        acti_id = request.parser_context['kwargs']['pk']
+        chap_id = request.parser_context['kwargs']['chapterid']
+
+        filecnt = Chapterfile.objects.count(activityid = acti_id, chapterid = chap_id)
+
+        if filecnt > 3 or filecnt < 0:
+            return Response('file count error', status=status.HTTP_400_BAD_REQUEST)
 
         if 'file' not in request.FILES:
-            raise ParseError("Empty content")
+            return Response('Empty Content', status=status.HTTP_400_BAD_REQUEST)
 
         f = request.FILES['file']
-        savedName = f.name.replace(" ","_")
+
+        savedName = f.name.replace(" ", "_")
         ext = os.path.splitext(f.name)[1]
-        newFilename = "%s.%s" % (uuid.uuid4(), ext.replace(".",""))
+        newFilename = "%s.%s" % (uuid.uuid4(), ext.replace(".", ""))
         addAttr = request.data
         date = datetime.datetime.now()
 
         destination = open(settings.MEDIA_ROOT + "/" + newFilename, 'wb+')
-        for chunk in f.chunks():
-            destination.write(chunk)
+        chucks = f.read()
+        pattern = re.compile(b"(?<=\r\n\r\n)[\s\S]*(?=\r\n------WebKitFormBoundary)", re.S)
+        # pattern = re.compile(b'\r\n\r\n[\s\S]+\r\n------WebKitFormBoundary', re.S)
+        data = re.search(pattern, chucks)
+        if data:
+            destination.write(data.group())
+        else:
+            destination.write(chucks)
         destination.close()  # File should be closed only after all chuns are added
-        
-        addAttr['activityid'] = request.parser_context['kwargs']['pk']
-        addAttr['chapterid'] = request.parser_context['kwargs']['chapterid']
-        addAttr['filepath'] =  newFilename #file_path
+
+        # with open(settings.MEDIA_ROOT + "/" + newFilename, 'rb') as d_file:
+        #     str_text = d_file.read()
+        #     print(str_text)
+        #
+        #     print(data)
+        addAttr['activityid'] = acti_id
+        addAttr['chapterid'] = chap_id
+        addAttr['filepath'] = newFilename  # file_path
         addAttr['filename'] = filename
         addAttr['fileext'] = ext
         addAttr['create_date'] = date
         addAttr['file'] = f
         addAttrDict = QueryDict('', mutable=True)
         addAttrDict.update(addAttr)
-
-        fileSerializer = ChapterfileSerializer(data = addAttrDict)
+        fileSerializer = ChapterfileSerializer(data=addAttrDict)
         if fileSerializer.is_valid():
-            
-            fileSerializer.save()       
-
-            os.remove(settings.MEDIA_ROOT + "/" + savedName)
- 
+            fileSerializer.save()
+            #os.remove(settings.MEDIA_ROOT + "/" + savedName)
             return Response(status=status.HTTP_201_CREATED)
         else:
-            os.remove(settings.MEDIA_ROOT + "/" + savedName)
-
-            return Response(fileSerializer.errors, status=status.HTTP_400_BAD_REQUEST)   
+            #os.remove(settings.MEDIA_ROOT + "/" + savedName)
+            return Response(fileSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 def getfile(request, pk, chapterid, filename):
     file_path = os.path.join(settings.MEDIA_ROOT, filename)
     #validated = dict()
-    
-    content_types = { 
+
+    content_types = {
         "zip" : "application/zip",
         "jpeg" :"image/jpeg",
         "jpg" : "image/jpeg",
@@ -282,23 +390,23 @@ def getfile(request, pk, chapterid, filename):
     c = content_types["others"]
     if filename.split(".")[1] in content_types:
         c = content_types[filename.split(".")[1]]
-    
+
     if os.path.exists(file_path):
         with open(file_path, 'rb') as fh:
             response = HttpResponse(fh.read(), content_type=c)
             response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
             return response
     else:
-        return Response(status=status.HTTP_400_BAD_REQUEST)  
+        return Response(status=status.HTTP_400_BAD_REQUEST)
     #file = Chapterfile.objects.filter(activityid = pk,chapterid = chapterid, filepath = filename)
     #validated['file'] = File(open('home/flood/casper-api/files/' + filename))
 
-    #return validated 
+    #return validated
 
 
 
 class CommentView(APIView):
-    
+
     def post(self,request):
         try:
             token = request.POST['access_token']
@@ -309,16 +417,16 @@ class CommentView(APIView):
             else:
                 context={'request': request}
                 date = datetime.datetime.now()
-                serializer = ChaptercommentSerializer(data=request.data,createtime=date)
+                serializer = ChaptercommentSerializer(data=request.data, createtime=date)
                 if serializer.is_valid(raise_exception=True):
 
-                    serializer.save(writer = pk['writer'])
+                    serializer.save(writer = pk['user_id'])
                     return Response(status=status.HTTP_201_CREATED)
                 else:
-                    return Response(status=status.HTTP_400_BAD_REQUEST) 
+                    return Response(status=status.HTTP_400_BAD_REQUEST)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        
+
     def delete(self,request,**kargs):
         if kargs.get('commentpk') is None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -335,10 +443,10 @@ class CommentView(APIView):
                     serializer = ChaptercommentSerializer(data=request.data,createtime=date)
                     if serializer.is_valid(raise_exception=True):
 
-                        serializer.save(writer = pk['writer'])
+                        serializer.save(writer = pk['user_id'])
                         return Response(status=status.HTTP_201_CREATED)
                     else:
-                        return Response(status=status.HTTP_400_BAD_REQUEST) 
+                        return Response(status=status.HTTP_400_BAD_REQUEST)
             except:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -346,54 +454,86 @@ class CommentView(APIView):
 def write_comment(request):
 
     try:
-        token = request.POST['access_token']
-        JWT = JWTValidation(token.split()[1])
-        pk = JWT.decode_jwt()
-        if not pk:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        else:
-            context={'request': request}
-            date = datetime.datetime.now()
-            serializer = ChaptercommentSerializer(data=request.data,createtime=date)
-            if serializer.is_valid(raise_exception=True):
-
-                serializer.save(writer = pk['writer'])
-                return Response(status=status.HTTP_201_CREATED)
-            else:
-                return Response(status=status.HTTP_400_BAD_REQUEST) 
+        token = JWTValidation(request.META['HTTP_AUTHORIZATION'].split()[1])
+        authed = token.decode_jwt()
+        
     except:
-        return Response(status=status.HTTP_400_BAD_REQUEST) 
+        #print("chapterupdate_here1")
+        return Response('auth_error', status=status.HTTP_400_BAD_REQUEST)
+
+
+    context={'request': request}
+    date = datetime.datetime.now()
+    serializer = ChaptercommentSerializer(data=request.data,createtime=date)
+    if serializer.is_valid(raise_exception=True):
+
+        serializer.save(writer = authed['user_id'])
+        return Response(status=status.HTTP_201_CREATED)
+    else:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 
 
 @api_view(['POST'])
 def delete_comment(request, commentpk):
     try:
-        token = request.POST['access_token']
-        JWT = JWTValidation(token.split()[1])
-        pk = JWT.decode_jwt()
-        pk = True
-        if not pk:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        else:
-            comment = Chaptercomment.objects.get(commentpk = commentpk)
-            comment.delete()
-            return Response(status=status.HTTP_200_OK)
+        token = JWTValidation(request.META['HTTP_AUTHORIZATION'].split()[1])
+        authed = token.decode_jwt()
+        
     except:
-        return Response(status=status.HTTP_400_BAD_REQUEST) 
+        #print("chapterupdate_here1")
+        return Response('auth_error', status=status.HTTP_400_BAD_REQUEST)
+
+    comment = Chaptercomment.objects.get(commentpk = commentpk, writer = authed['user_id'])
+    comment.delete()
+    return Response(status=status.HTTP_200_OK)
+
 
 
 @api_view(['GET'])
-def search_all(request, keyword):
+def search_all(request):
     try:
-        search = {}
+        keyword = request.GET.get('keyword', '')
         acti = Activity.objects.filter(Q(title__icontains=keyword) | Q(description__icontains=keyword)).distinct()
-        chapter = Activity.objects.filter(Q(article__icontains=keyword) | Q(subject__icontains=keyword)).distinct()
-        search['activities'] = acti
-        search['chapters'] = chapter
-        #return search
-        return Response(search, status=status.HTTP_200_OK)
-    except:
+        chapter = Chapter.objects.filter(Q(article__icontains=keyword) | Q(subject__icontains=keyword)).distinct()
+
+        acti_serializer = ActivityListSerializer(acti, many=True, context={'request': request})
+        chapter_serializer = ChapterSerializer(chapter, many=True, context={'request': request})
+        addTagName(acti_serializer.data, Tag)
+        addUserName(acti_serializer.data, User)
+
+        search_type = request.GET.get('search_type')
+        if search_type == 'activity':
+            search = acti_serializer.data
+        elif search_type == 'chapter':
+            search = chapter_serializer.data
+        else:
+            search = acti_serializer.data + chapter_serializer.data
+            search_type = 'all'
+
+        # get query 로 페이지 번호와 페이지 크기를 입력받음
+        page_size = int(request.GET.get('page_size', 10))
+        page_number = int(request.GET.get('page_number', 1))
+
+        paginator = Paginator(search, page_size)
+        paginated_search = paginator.page(page_number).object_list
+        ret = {"searched_objects_count": paginator.count,
+               "page_size": page_size,  # 페이지 사이즈
+               "page_index": page_number,  # 현재 페이지 번호
+               "page_end_index": paginator.num_pages,  # 페이지 끝 번호
+               "search_type": search_type,  # 검색 유형
+               "searched_objects": paginated_search  # 검색 결과들
+               }
+        # 이게 더 간단함. 물론 이렇게 쓰는건 아닌 것 같지만, 일단 원하는 대로 작동은 함
+        return Response(ret, status=status.HTTP_200_OK)
+    except EmptyPage as e:
+        return Response({"error": e.args[0]}, status=status.HTTP_400_BAD_REQUEST)
+    except ValueError:
+        return Response({"error": "Input Value must be an integer"}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        # print(type(e))
+        # print(e)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 

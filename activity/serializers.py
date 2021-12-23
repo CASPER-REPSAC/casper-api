@@ -1,13 +1,8 @@
 from rest_framework import serializers
 from activity.models import *
 from accounts.models import User
-from django.contrib.auth.models import User, Group
-
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('url', 'username', 'email', 'groups')
+from django.contrib.auth.models import Group
+from django.contrib.auth import get_user_model
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -59,3 +54,22 @@ class ActivitySerializer(serializers.ModelSerializer):
         model = Activity
         fields = ['url', 'id', 'title', 'type', 'author', 'createDate', 'description',
                   'startDate', 'endDate', 'currentState', 'viewerNum', 'tags', 'participants']
+
+
+class Acti_IdSerializer(serializers.ModelSerializer):
+    # < 현재테이블 >.< FK인user컬럼 >.< 역참조관계명 >.all()
+    name = ActivityParticipant.objects.select_related('acti')
+
+    class Meta:
+        model = ActivityParticipant
+        fields = ['user_id']
+
+
+class UserSerializer(serializers.ModelSerializer):
+    User = get_user_model()
+    # activity_id = Acti_IdSerializer(many=True, read_only=True)
+    acti = ActivityParticipant.objects.select_related('acti')
+
+    class Meta:
+        model = User
+        fields = ('id', 'email', 'acti')

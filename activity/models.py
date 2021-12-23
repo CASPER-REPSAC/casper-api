@@ -70,3 +70,16 @@ class ActivityParticipant(models.Model):
         managed = True
         db_table = 'activity_participant'
 
+class Social(models.Model):
+    id = models.AutoField(primary_key=True)
+    provider = models.CharField(max_length=30)
+    uid = models.CharField(max_length=191)
+    last_login = models.DateTimeField()
+    date_joined = models.DateTimeField()
+    extra_data = models.TextField()
+    user = models.ForeignKey(User, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'socialaccount_socialaccount'
+        unique_together = (('provider', 'uid'),)
