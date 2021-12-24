@@ -43,7 +43,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 SOCIAL_AUTH_GOOGLE_CLIENT_ID = default_authid
 SOCIAL_AUTH_GOOGLE_SECRET = default_authsecret
-SITE_ID = 2 #default_siteid
+SITE_ID = 3 #default_siteid
 
 
 
