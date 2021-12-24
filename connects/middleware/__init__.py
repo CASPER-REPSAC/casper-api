@@ -34,9 +34,9 @@ class JWTValidation:
         try:
             payload = jwt.decode(self.token, settings.SECRET_KEY, algorithms=["HS256"])
         except:
-            payload = False
+            return False
         
         if payload['user_id'] is None:
-            payload = False
+            return False
 
         return payload

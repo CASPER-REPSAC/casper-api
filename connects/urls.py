@@ -6,32 +6,33 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 from managing.views import search_all
+from activity.member_management import ownActivity, containedActivity
 
 admin.autodiscover()
 
-
 urlpatterns = [
     url('admin/', admin.site.urls),
-    # GET, POST uri
-    # path('', activity_list),
-    # path('api/w00/activities', activity_list),
-    #path('api/w00/activities/', ActivityViewSet),
-    #path('api/activities', activity_list),
-   
-    #Search
-    path('api/search/<str:keyword>/',search_all),
 
-    #Activity
+    # ownActivity
+    path('api/user/<int:pk>/', ownActivity),
+
+    # contained Activitiy
+    path('api/user/contained/', containedActivity),
+
+    # Search
+    path('api/search/', search_all),
+
+    # Activity
     path('api/w00/', include('activity.urls')),
 
-    #Chapter
+    # Chapter
     path('api/activities/', include('managing.urls')),
 
-    #JWT Verify
+    # JWT Verify
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
-    #OAuth
+    # OAuth
     path('accounts/', include('dj_rest_auth.urls')),
     path('accounts/', include('allauth.urls')),
     path('accounts/', include('accounts.urls')),

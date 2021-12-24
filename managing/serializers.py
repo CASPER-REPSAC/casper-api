@@ -31,6 +31,12 @@ class ChaptercommentSerializer(serializers.ModelSerializer):
         model = Chaptercomment
         fields = ('activityid', 'chapterid', 'commentpk', 'comment', 'writer','createtime')
 
+class ChaptercommentWriteSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Chaptercomment
+        fields = ('activityid', 'chapterid', 'commentpk', 'comment', 'writer')
+
 
 # Attachment
 class ChapterfileSerializer(serializers.ModelSerializer):
