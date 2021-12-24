@@ -125,7 +125,6 @@ def activity_detail(request, pk):
     elif request.method == "PATCH":
         activity_instance = Activity.objects.get(pk=pk)
         try:
-            authori = request.META['HTTP_AUTHORIZATION']
             token = JWTValidation(request.META['HTTP_AUTHORIZATION'].split()[1])
             authed = token.decode_jwt()
             user_instance = User.objects.get(id=authed['user_id'])
@@ -133,16 +132,38 @@ def activity_detail(request, pk):
                 return Response('auth_error', status=status.HTTP_400_BAD_REQUEST)
         except:
             return Response('auth_error', status=status.HTTP_400_BAD_REQUEST)
+        #print('===========')
+        #print(request.data.get('participants_delete'))
+        deleted_participants = request.data['participants_delete']
+        #print(k)
+        #print(type(k))
+
+        for i in deleted_participants:
+            if(authed['user_id'] == i):
+                pass
+            else:
+                part = ActivityParticipant.objects.get(user_id = i, activity_id = pk)
+                try:
+                    #print(type(part))
+                    # If you get here, it exists...
+                    part.delete()
+                except:
+                    pass
+                    # Doesn't exist!
+                
+
         serializer = ActivityListSerializer(activity_instance, data=request.data, partial=True, context=context)
         # set partial=True to update a data partially
         if serializer.is_valid():
             serializer.save(author=user_instance.email)
             activity_instance = Activity.objects.get(pk=pk)
+
             if 'tags' in request.data:
                 old_tags = ActivityTag.objects.filter(activity_id=pk)
                 old_tags.delete()
                 req_tags = request.data['tags']  # post 로 입력받은 태그 리스트
                 exist_tags = [tag.name for tag in Tag.objects.all()]  # 존재하는 태그 가져옴
+
                 for r_tag in req_tags:
                     if r_tag not in exist_tags:  # 없으면 태그 db 에 등록
                         Tag(name=r_tag).save()
