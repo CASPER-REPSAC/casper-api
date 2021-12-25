@@ -5,19 +5,24 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+from django.views.generic import RedirectView
 from managing.views import search_all
-from activity.member_management import ownActivity, containedActivity
+from activity.member_management import ownActivity, containedActivity_new,  containedActivity
 
 admin.autodiscover()
 
 urlpatterns = [
-    url('admin/', admin.site.urls),
+    # path('api-auth/', include('rest_framework.urls'), name='api-login'),
+    # path('favicon.ico', RedirectView.as_view(url='/static/favicon.ico')),
+    #url('admin/', admin.site.urls),
 
     # ownActivity
     path('api/user/<int:pk>/', ownActivity),
 
     # contained Activitiy
     path('api/user/contained/', containedActivity),
+    path('api/user/contained_new/', containedActivity_new),
+
 
     # Search
     path('api/search/', search_all),

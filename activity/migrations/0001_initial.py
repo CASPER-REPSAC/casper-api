@@ -33,11 +33,11 @@ class Migration(migrations.Migration):
             name='Activity',
             fields=[
                 ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('title', models.CharField(max_length=50)),
+                ('title', models.CharField(max_length=100)),
                 ('type', models.CharField(choices=[('CTF', 'CTF'), ('Study', 'Study'), ('Project', 'Project')], max_length=50)),
                 ('author', models.CharField(max_length=50)),
                 ('createDate', models.DateField(db_column='createDate')),
-                ('description', models.CharField(max_length=65)),
+                ('description', models.CharField(max_length=100)),
                 ('startDate', models.DateField(db_column='startDate')),
                 ('endDate', models.DateField(db_column='endDate')),
                 ('currentState', models.PositiveIntegerField(choices=[(0, '0 : 예정'), (1, '1 : 진행'), (2, '2 : 종료')], db_column='currentState', default=0)),

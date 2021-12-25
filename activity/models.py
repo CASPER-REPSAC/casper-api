@@ -5,7 +5,7 @@ from accounts.models import User
 # Create your models here.
 class Activity(models.Model):
     id = models.AutoField(primary_key=True)
-    title = models.CharField(max_length=50)
+    title = models.CharField(max_length=100)
     type_CHOICES = (
         ('CTF', 'CTF'),
         ('Study', 'Study'),
@@ -14,7 +14,7 @@ class Activity(models.Model):
     type = models.CharField(max_length=50, choices=type_CHOICES)
     author = models.CharField(max_length=50)
     createDate = models.DateField(db_column='createDate')
-    description = models.CharField(max_length=65)
+    description = models.CharField(max_length=100)
     startDate = models.DateField(db_column='startDate')
     endDate = models.DateField(db_column='endDate')
     currentState_CHOICES = (

@@ -5,7 +5,7 @@ from activity.views import ActivityViewSet
 from rest_framework import renderers
 from rest_framework.routers import DefaultRouter
 from django.views.generic import RedirectView
-
+from .member_management import containedActivity_new
 
 # router를 생성하고 viewset을 등록한다
 router = DefaultRouter()
@@ -21,4 +21,5 @@ urlpatterns = [
     path('', include(router.urls)),
     path('api-auth/', include('rest_framework.urls')),
     path('favicon.ico', RedirectView.as_view(url='/static/favicon.ico')),
+    path('test/', containedActivity_new)
 ]
