@@ -79,8 +79,10 @@ INSTALLED_APPS = [
     'managing',
     # Feature : Create Activity
     'activity',
+  
     # api doc module
     #'drf_yasg',
+
 
     #SSL
     #'sslserver',
