@@ -15,10 +15,55 @@ cd ./casper-api
 python3 -m virtualenv venv
 source ./venv/bin/activate
 pip3 install -r requirements.txt
+
+Do First Setting
+
+python3 manage.py createsuperuser
 python3 manage.py makemigrations
 python3 manage.py migrate --run-syncdb
 python3 manage.py runserver
+
+Do Social Sites Setting
 ``` 
+
+## First Setting
+0. You need Google API Client ID and Client Key
+1. Move to connects Directory
+2. Make keys.json
+3. Move back to Connects Root Directory
+4. Make 'file' directory
+5. Make 'logs' directroy
+
+```
+## keys.json
+{
+    "settings-secret-key" : "c1:6~tX4*m/ym*.WP2_,LN_4OLV(j!P/w_X{yZjWbc$T}fA?!E",
+
+    "default-database-ENGINE" :"Your_Django_DB_Engine",
+    "default-database-NAME" :"Your_Django_DB_Name",
+    "default-database-USER" :"Your_Django_DB_Account",
+    "default-database-PASSWORD" :"Your_Django_DB_PW",
+    "default-database-HOST" :"Your_Django_DB_Host_eg_localhost", 
+    "default-database-PORT" :"Your_Django_DB_Default_3306",
+
+    "social_auth_google_client_id" : "Your_Google_API_Client_ID",
+    "social_auth_google_secret":"Your_Google_API_Client_Key",
+    "state":"Random_String_Or_Key_What_You_Want",
+    
+    "STATE" : "Random_String_Or_Key_What_You_Want"
+}
+
+```
+
+
+## Social Sites Setting
+1. Start Connects API Server
+2. Move to admin page and sign using superuser
+```
+http://127.0.0.1:8000/admin
+```
+3. Click 'Sites' tab and add your domain
+4. Click 'Social application' and add you Google API Client Key, Client Id and Site(step 3)
  
 ## 스택
 <p align="left">
