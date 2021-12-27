@@ -64,6 +64,7 @@ http://127.0.0.1:8000/admin
 ```
 3. Click 'Sites' tab and add your domain
 4. Click 'Social application' and add you Google API Client Key, Client Id and Site(step 3)
+5. Set you SITE_ID (in settings.py) by step 3
  
 ## 스택
 <p align="left">
