@@ -28,7 +28,7 @@ Do Social Sites Setting
 
 ## First Setting
 0. You need Google API Client ID and Client Key
-1. Move to connects Directory
+1. Move to 'connects' Directory
 2. Make keys.json
 3. Move back to Connects Root Directory
 4. Make 'file' directory
