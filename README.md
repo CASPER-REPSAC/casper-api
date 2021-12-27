@@ -37,7 +37,7 @@ Do Social Sites Setting
 ```
 ## keys.json
 {
-    "settings-secret-key" : "c1:6~tX4*m/ym*.WP2_,LN_4OLV(j!P/w_X{yZjWbc$T}fA?!E",
+    "settings-secret-key" : "Random_String_Or_Key_What_You_Want",
 
     "default-database-ENGINE" :"Your_Django_DB_Engine",
     "default-database-NAME" :"Your_Django_DB_Name",
