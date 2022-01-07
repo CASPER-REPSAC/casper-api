@@ -18,7 +18,8 @@ from allauth.socialaccount.models import SocialAccount
 from .models import User
 
 # BASE_URL = 'http://api.w00.kr/'
-BASE_URL = 'http://localhost:8000/'
+#BASE_URL = 'http://localhost:8000/'
+BASE_URL = 'https://connects.casper.or.kr/'
 GOOGLE_CALLBACK_URI = BASE_URL + 'accounts/google/callback/'
 KAKAO_CALLBACK_URI = BASE_URL + 'accounts/kakao/callback/'
 GITHUB_CALLBACK_URI = BASE_URL + 'accounts/github/callback/'
@@ -32,13 +33,16 @@ def google_login(request):
     """
     scope = "https://www.googleapis.com/auth/userinfo.email"
     client_id = getattr(settings, "SOCIAL_AUTH_GOOGLE_CLIENT_ID")
+    #client_id = '783980082753-50s49eqp4oj90h80f5d7ka26ko1l8ao0.apps.googleusercontent.com'
     return redirect(
         f"https://accounts.google.com/o/oauth2/v2/auth?client_id={client_id}&response_type=code&redirect_uri={GOOGLE_CALLBACK_URI}&scope={scope}")
 
 
 @csrf_exempt
 def access_token_receive(request):
+    #print(1)
     code = request.GET.get('code')
+    #print(code)
     """
     Get Access Token 
     """

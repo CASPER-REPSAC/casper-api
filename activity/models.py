@@ -14,7 +14,7 @@ class Activity(models.Model):
     type = models.CharField(max_length=50, choices=type_CHOICES)
     author = models.CharField(max_length=50)
     createDate = models.DateField(db_column='createDate')
-    description = models.CharField(max_length=100)
+    description = models.CharField(max_length=1200)
     startDate = models.DateField(db_column='startDate')
     endDate = models.DateField(db_column='endDate')
     currentState_CHOICES = (

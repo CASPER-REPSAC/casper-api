@@ -40,9 +40,12 @@ class RegistrationSerializer(serializers.ModelSerializer):
        return instance
 
       '''
-
+class SocialUsersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SocialUser
+        fields = ('id','extra_data','user') 
 
 class UsersSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('email')  # , 'username', '')
+        fields = ('id','email','first_name','last_name')  # , 'username', '')

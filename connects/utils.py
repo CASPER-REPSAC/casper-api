@@ -3,7 +3,8 @@ from rest_framework.utils.serializer_helpers import ReturnDict
 from connects.middleware import JWTValidation
 from django.contrib.auth import get_user_model
 from rest_framework.response import Response
-
+from accounts.models import SocialUser
+import json
 
 def addTagName(response_data, Tag):
     tag_list = Tag.objects.all()
@@ -23,13 +24,57 @@ def addTagName(response_data, Tag):
 # 새로운 버전의 addUserName 함수
 def addUserName(response_data, User):
     user_list = User.objects.all()
+    social_userlist = SocialUser.objects.all()
+
     if type(response_data) == ReturnDict:
         for o_idx, user in enumerate(response_data['participants']):
-            response_data['participants'][o_idx]['user_name'] = str(user_list.get(pk=user['user_id']))
+            #_user = user_list.get(pk=user['user_id'])
+            _social = social_userlist.get(pk=user['user_id'])
+            #print(json.loads(str(_social.extra_data)))
+            _json = json.loads(str(_social.extra_data))
+            _json.pop('verified_email')
+            _json.pop('id')
+            _json.pop('locale')
+
+            ##tmp
+            response_data['participants'][o_idx]['user_name'] = _json["name"]
+
+            ## Need to Change
+            #response_data['participants'][o_idx]['user_name'] = str(_user.email)
+            #response_data['participants'][o_idx]['first_name'] = str(_user.first_name)
+            #response_data['participants'][o_idx]['last_name'] = str(_user.last_name)
+
+            #response_data['participants'][o_idx]['picture'] = _json["picture"]
+            #response_data['participants'][o_idx]['user_name'] = _json["email"]
+            #response_data['participants'][o_idx]['first_name'] = _json["given_name"]
+            #response_data['participants'][o_idx]['last_name'] = _json["name"]
     else:
         for d_idx, _object in enumerate(response_data):
             for o_idx, user in enumerate(_object['participants']):
-                response_data[d_idx]['participants'][o_idx]['user_name'] = str(user_list.get(pk=user['user_id']))
+                #_user = user_list.get(pk=user['user_id'])
+                _social = social_userlist.get(pk=user['user_id'])
+                _json = json.loads(str(_social.extra_data))
+                _json.pop('verified_email')
+                _json.pop('id')
+                _json.pop('locale')
+                
+                response_data[d_idx]['participants'][o_idx]['profile'] = _json
+
+                ##tmp
+                response_data[d_idx]['participants'][o_idx]['user_name'] = _json["name"]
+
+
+                ## Need to Change
+                #response_data[d_idx]['participants'][o_idx]['user_name'] = str(_user.email)
+                #response_data[d_idx]['participants'][o_idx]['first_name'] = str(_user.first_name)
+                #response_data[d_idx]['participants'][o_idx]['last_name'] = str(_user.last_name)
+                
+                #response_data[d_idx]['participants'][o_idx]['picture'] = _json["picture"]
+                #response_data[d_idx]['participants'][o_idx]['user_name'] = _json["email"]
+                #response_data[d_idx]['participants'][o_idx]['first_name'] = _json["given_name"]
+                #response_data[d_idx]['participants'][o_idx]['last_name'] = _json["name"]
+  
+
 
 
 def USER_AUTHORIZAION(request):

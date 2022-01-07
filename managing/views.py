@@ -21,6 +21,7 @@ from connects.middleware import JWTValidation
 from connects.utils import addTagName, addUserName
 from .models import Activity, Chapter, Chaptercomment, Chapterfile
 from .serializers import *
+from accounts.models import UserReturn
 
 
 ## Activity
@@ -32,7 +33,7 @@ def activity_list(request):
         activities = Activity.objects.all()
         serializer = ActivityListSerializer(activities, many=True, context=context)
         addTagName(serializer.data, Tag)
-        addUserName(serializer.data, User)
+        addUserName(serializer.data, UserReturn)
         return Response(serializer.data)
 
     elif request.method == "POST":
@@ -79,7 +80,7 @@ def activity_detail(request, pk):
         ####start#####
         ### 공사중 ###
         addTagName(serializer.data, Tag)
-        addUserName(serializer.data, User)
+        addUserName(serializer.data, UserReturn)
         ######end#####
 
         return Response(serializer.data)
