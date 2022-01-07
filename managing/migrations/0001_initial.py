@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
             name='Chapter',
             fields=[
                 ('chapterid', models.AutoField(primary_key=True, serialize=False)),
-                ('subject', models.CharField(max_length=16)),
+                ('subject', models.CharField(max_length=129)),
                 ('created_time', models.DateTimeField(auto_now_add=True)),
                 ('modified_time', models.DateTimeField(auto_now=True)),
                 ('article', models.CharField(max_length=500)),

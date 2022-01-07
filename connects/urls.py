@@ -55,7 +55,7 @@ schema_view = get_schema_view(
 urlpatterns = [
     # path('api-auth/', include('rest_framework.urls'), name='api-login'),
     # path('favicon.ico', RedirectView.as_view(url='/static/favicon.ico')),
-    #url('admin/', admin.site.urls),
+    url('admin/', admin.site.urls),
 
     # ownActivity
     path('api/user/<int:pk>/', ownActivity),
