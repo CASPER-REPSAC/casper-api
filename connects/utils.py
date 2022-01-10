@@ -29,7 +29,7 @@ def addUserName(response_data, User):
     if type(response_data) == ReturnDict:
         for o_idx, user in enumerate(response_data['participants']):
             #_user = user_list.get(pk=user['user_id'])
-            _social = social_userlist.get(pk=user['user_id'])
+            _social = social_userlist.get(user=user['user_id'])
             #print(json.loads(str(_social.extra_data)))
             _json = json.loads(str(_social.extra_data))
             _json.pop('verified_email')
@@ -52,7 +52,7 @@ def addUserName(response_data, User):
         for d_idx, _object in enumerate(response_data):
             for o_idx, user in enumerate(_object['participants']):
                 #_user = user_list.get(pk=user['user_id'])
-                _social = social_userlist.get(pk=user['user_id'])
+                _social = social_userlist.get(user=user['user_id'])
                 _json = json.loads(str(_social.extra_data))
                 _json.pop('verified_email')
                 _json.pop('id')
