@@ -3,6 +3,7 @@ from activity.models import *
 from accounts.models import User
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -49,11 +50,21 @@ class User_IdSerializer(serializers.ModelSerializer):
 class ActivitySerializer(serializers.ModelSerializer):
     tags = Tag_IdSerializer(many=True, read_only=True)
     participants = User_IdSerializer(many=True, read_only=True)
+    auth_string = serializers.CharField(
+        write_only=True,
+        required=True,
+        help_text='Leave empty if no change needed',
+        style={'input_type': 'password', 'placeholder': 'Password'}
+    )
+
+    def create(self, validated_data):
+        validated_data['password'] = make_password(validated_data.get('password'))
+        return super(ActivitySerializer, self).create(validated_data)
 
     class Meta:
         model = Activity
-        fields = ['url', 'id', 'title', 'type', 'author', 'createDate', 'description',
-                  'startDate', 'endDate', 'currentState', 'viewerNum', 'tags', 'participants']
+        fields = ('url', 'id', 'title', 'type', 'author', 'createDate', 'description',
+                  'startDate', 'endDate', 'currentState', 'viewerNum', 'tags', 'participants', 'auth_string')
 
 
 class Acti_IdSerializer(serializers.ModelSerializer):

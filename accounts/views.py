@@ -15,7 +15,7 @@ from allauth.socialaccount.providers.kakao import views as kakao_view
 from allauth.socialaccount.providers.github import views as github_view
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from allauth.socialaccount.models import SocialAccount
-from .models import User
+from .models import User, SocialUser
 
 # BASE_URL = 'http://api.w00.kr/'
 #BASE_URL = 'http://localhost:8000/'
@@ -84,6 +84,11 @@ def access_token_receive(request):
         accept_json = accept.json()
         # accept_json.pop('user', None)
         #print("Account Info Exist")
+        _json = json.loads(str(SocialUser.objects.get(user = user).extra_data))
+        _json.pop('verified_email')
+        _json.pop('id')
+        _json.pop('locale')
+        accept_json['profile'] = _json
         return JsonResponse(accept_json)
     except User.DoesNotExist:
         # 기존에 가입된 유저가 없으면 새로 가입
@@ -96,6 +101,13 @@ def access_token_receive(request):
         accept_json = accept.json()
         # accept_json.pop('user', None)
         #print("Account Info is not Exist")
+
+        _json = json.loads(str(SocialUser.objects.get(user = user).extra_data))
+        _json.pop('verified_email')
+        _json.pop('id')
+        _json.pop('locale')
+        accept_json['profile'] = _json
+
         return JsonResponse(accept_json)
 
 
@@ -145,6 +157,7 @@ def google_callback(request):
             return JsonResponse({'err_msg': 'failed to signin'}, status=accept_status)
         accept_json = accept.json()
         accept_json.pop('user', None)
+
         return JsonResponse(accept_json)
     except User.DoesNotExist:
         # 기존에 가입된 유저가 없으면 새로 가입
@@ -157,6 +170,7 @@ def google_callback(request):
             return JsonResponse({'err_msg': 'failed to signup'}, status=accept_status)
         accept_json = accept.json()
         accept_json.pop('user', None)
+
         return JsonResponse(accept_json)
 
 

@@ -39,7 +39,7 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
 SECRET_PATH = os.path.join(ROOT_DIR, '.footprint_secret')
 SECRET_BASE_FILE = os.path.join(BASE_DIR, 'connects/keys.json')
 SECRET_KEY = json_secret_key
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = ['*']
 SOCIAL_AUTH_GOOGLE_CLIENT_ID = default_authid
 SOCIAL_AUTH_GOOGLE_SECRET = default_authsecret
@@ -79,8 +79,10 @@ INSTALLED_APPS = [
     'managing',
     # Feature : Create Activity
     'activity',
+  
     # api doc module
     #'drf_yasg',
+
 
     #SSL
     #'sslserver',

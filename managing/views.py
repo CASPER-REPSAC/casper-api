@@ -3,6 +3,7 @@ import datetime
 import os
 import re
 import uuid
+import json
 
 from django.conf import settings
 from django.core.paginator import Paginator, EmptyPage
@@ -21,6 +22,7 @@ from connects.middleware import JWTValidation
 from connects.utils import addTagName, addUserName
 from .models import Activity, Chapter, Chaptercomment, Chapterfile
 from .serializers import *
+from accounts.models import SocialUser, UserReturn
 
 
 ## Activity
@@ -32,7 +34,7 @@ def activity_list(request):
         activities = Activity.objects.all()
         serializer = ActivityListSerializer(activities, many=True, context=context)
         addTagName(serializer.data, Tag)
-        addUserName(serializer.data, User)
+        addUserName(serializer.data, UserReturn)
         return Response(serializer.data)
 
     elif request.method == "POST":
@@ -79,7 +81,7 @@ def activity_detail(request, pk):
         ####start#####
         ### 공사중 ###
         addTagName(serializer.data, Tag)
-        addUserName(serializer.data, User)
+        addUserName(serializer.data, UserReturn)
         ######end#####
 
         return Response(serializer.data)
@@ -278,6 +280,14 @@ def chapter_detail(request, pk, chapterid):
         for i in range(len(cmtserializer.data)):
             k = cmtserializer.data[i]
             k['user'] = chaptercomment[i].writer.email
+
+
+            _json = json.loads(str(SocialUser.objects.get(user = chaptercomment[i].writer).extra_data))
+            _json.pop('verified_email')
+            _json.pop('id')
+            _json.pop('locale')
+
+            k['profile'] = _json
             comments.append(k)
 
         ret.append(comments)
@@ -380,7 +390,7 @@ class FileView(APIView):
 
         savedName = f.name.replace(" ", "_")
         ext = os.path.splitext(f.name)[1]
-        print(ext)
+        #print(ext)
         if ext in ext_not_allowed:
             return Response('EXT NOT ALLOWED', status=status.HTTP_400_BAD_REQUEST)
 
