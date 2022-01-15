@@ -78,9 +78,11 @@ http://127.0.0.1:8000/admin
 - [Frontend](https://github.com/CASPER-REPSAC/connect-frontend)
 
 ## 기능
+
+<!--
 ### 0. URI 문서
 - [API 요청 URI](https://www.notion.so/floodnut/Connects-API-64005bb57a964411afb8517cf5f8c231)
-
+-->
 ### 1. Social Auth
 - Provider Google
 - JWT를 통한 사용자 인증
