@@ -62,6 +62,7 @@ def activity_list(request):
                 serializer = ActivityListSerializer(activity_instance, context=context)
                 # 시리얼라이저를 재정의해서 데이터를 다시가져오는 것으로 해결.
                 addTagName(serializer.data, Tag)
+                addUserName(serializer.data, UserReturn)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

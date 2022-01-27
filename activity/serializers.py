@@ -51,14 +51,18 @@ class ActivitySerializer(serializers.ModelSerializer):
     tags = Tag_IdSerializer(many=True, read_only=True)
     participants = User_IdSerializer(many=True, read_only=True)
     auth_string = serializers.CharField(
-        write_only=True,
+        # write_only=True,
         required=True,
-        help_text='Leave empty if no change needed',
-        style={'input_type': 'password', 'placeholder': 'Password'}
+        # help_text='Leave empty if no change needed',
+        # style={'input_type': 'password', 'placeholder': 'Password'}
     )
 
     def create(self, validated_data):
-        validated_data['password'] = make_password(validated_data.get('password'))
+        validated_data['auth_string'] = make_password(validated_data.get('auth_string'))
+        return super(ActivitySerializer, self).create(validated_data)
+
+    def update(self, instance, validated_data):
+        validated_data['auth_string'] = make_password(validated_data.get('auth_string'))
         return super(ActivitySerializer, self).create(validated_data)
 
     class Meta:
