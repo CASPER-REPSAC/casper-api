@@ -7,9 +7,8 @@ from accounts.models import User
 # Create your models here.
 class Activity(models.Model):
     id = models.AutoField(primary_key=True)
-    auth_string = models.CharField(max_length=128,
-                                default="pbkdf2_sha256$260000$j9olt89iQqM4IUMLv2KslY$ULBaVPAH6MjZlKFvhDJ4YpqBUtNI7ItL5Ui2FDL0u+Y=",
-                                db_column='auth_string')
+    authString = models.CharField(max_length=128,
+                                  db_column='authString', null=True, blank=True)
     title = models.CharField(max_length=100)
     type_CHOICES = (
         ('CTF', 'CTF'),

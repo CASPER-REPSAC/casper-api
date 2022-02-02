@@ -75,7 +75,7 @@ class ActivityListSerializer(serializers.HyperlinkedModelSerializer):
                   'startDate', 'endDate', 'currentState', 'viewerNum', 'tags', 'participants')
 
 
-class ActivitySerializer(serializers.HyperlinkedModelSerializer):
+class ActivityChapterSerializer(serializers.HyperlinkedModelSerializer):
     tags = Tag_IdSerializer(many=True, read_only=True)
     participants = User_IdSerializer(many=True, read_only=True)
     chapterid = ChapterListSerializer(many=True, read_only=True)

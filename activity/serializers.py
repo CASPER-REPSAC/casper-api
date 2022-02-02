@@ -6,6 +6,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 
 
+# from managing.serializers import ChapterListSerializer
+
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
@@ -50,25 +52,25 @@ class User_IdSerializer(serializers.ModelSerializer):
 class ActivitySerializer(serializers.ModelSerializer):
     tags = Tag_IdSerializer(many=True, read_only=True)
     participants = User_IdSerializer(many=True, read_only=True)
-    auth_string = serializers.CharField(
+    authString = serializers.CharField(
         # write_only=True,
-        required=True,
+        # required=True,
         # help_text='Leave empty if no change needed',
-        # style={'input_type': 'password', 'placeholder': 'Password'}
     )
 
+    # chapterid = ChapterListSerializer(many=True, read_only=True)
     def create(self, validated_data):
-        validated_data['auth_string'] = make_password(validated_data.get('auth_string'))
+        validated_data['authString'] = make_password(validated_data.get('authString'))
         return super(ActivitySerializer, self).create(validated_data)
 
     def update(self, instance, validated_data):
-        validated_data['auth_string'] = make_password(validated_data.get('auth_string'))
-        return super(ActivitySerializer, self).create(validated_data)
+        validated_data['authString'] = make_password(validated_data.get('authString'))
+        return super(ActivitySerializer, self).update(instance, validated_data)
 
     class Meta:
         model = Activity
         fields = ('url', 'id', 'title', 'type', 'author', 'createDate', 'description',
-                  'startDate', 'endDate', 'currentState', 'viewerNum', 'tags', 'participants', 'auth_string')
+                  'startDate', 'endDate', 'currentState', 'viewerNum', 'tags', 'participants', 'authString')
 
 
 class Acti_IdSerializer(serializers.ModelSerializer):
