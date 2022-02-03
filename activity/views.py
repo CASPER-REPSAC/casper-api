@@ -10,6 +10,8 @@ from activity.serializers import *
 from rest_framework import generics, mixins, views
 
 from rest_framework import status
+from accounts.models import SocialUser, UserReturn
+from django.utils.html import escape
 
 User = get_user_model()
 
@@ -22,16 +24,21 @@ class ActivityViewSet(viewsets.ModelViewSet):
     """
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
-    permission_classes = [IsAuthenticated]
+
+    # permission_classes = [IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
+        # page = self.paginate_queryset(queryset)
+        # if page is not None:
+        #     serializer = self.get_serializer(page, many=True)
+        #     addTagName(serializer.data, Tag)
+        #     addUserName(serializer.data, UserReturn)
+        #     return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(queryset, many=True)
+        addTagName(serializer.data, Tag)
+        addUserName(serializer.data, UserReturn)
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
@@ -54,6 +61,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
                 serializer = ActivitySerializer(activity_instance, context=context)
                 # 시리얼라이저를 재정의해서 데이터를 다시가져오는 것으로 해결.
                 addTagName(serializer.data, Tag)
+                addUserName(serializer.data, UserReturn)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -66,18 +74,69 @@ class ActivityViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
+        context = {'request': request}
 
-        if getattr(instance, '_prefetched_objects_cache', None):
+        activity_instance = self.get_object()
+
+        try:
+            token = JWTValidation(request.META['HTTP_AUTHORIZATION'].split()[1])
+            authed = token.decode_jwt()
+            user_instance = User.objects.get(id=authed['user_id'])
+            if activity_instance.author != user_instance.email:
+                return Response('auth_error', status=status.HTTP_400_BAD_REQUEST)
+        except:
+            return Response('auth_error', status=status.HTTP_400_BAD_REQUEST)
+        partial = kwargs.pop('partial', False)
+
+        serializer = self.get_serializer(activity_instance, data=request.data, partial=partial, context=context)
+        # # set partial=True to update a data partially
+
+        # serializer.is_valid(raise_exception=True)
+        # self.perform_update(serializer)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(author=user_instance.email,
+                            title=escape(request.data['title']))
+            # , description = escape(request.data['description']))
+
+        if getattr(activity_instance, '_prefetched_objects_cache', None):
             # If 'prefetch_related' has been applied to a queryset, we need to
             # forcibly invalidate the prefetch cache on the instance.
-            instance._prefetched_objects_cache = {}
+            activity_instance._prefetched_objects_cache = {}
+        deleted_participants = request.data['participants_delete']
+        for i in deleted_participants:
+            if (authed['user_id'] == i):
+                pass
+            else:
+                part = ActivityParticipant.objects.get(user_id=i, activity_id=pk)
+                try:
+                    # print(type(part))
+                    # If you get here, it exists...
+                    part.delete()
+                except:
+                    pass
+                    # Doesn't exist!
+        pk = activity_instance.id
+        if 'tags' in request.data:
+            old_tags = ActivityTag.objects.filter(activity_id=pk)
+            old_tags.delete()
+            req_tags = request.data['tags']  # post 로 입력받은 태그 리스트
+            exist_tags = [tag.name for tag in Tag.objects.all()]  # 존재하는 태그 가져옴
 
-        return Response(serializer.data)
+            for r_tag in req_tags:
+                if r_tag not in exist_tags:  # 없으면 태그 db 에 등록
+                    Tag(name=r_tag).save()
+                tag_instance = Tag.objects.get(name=r_tag)  # 태그 인스턴스 찾아옴
+                ActivityTag(activity_id=activity_instance, tag_id=tag_instance).save()  # activity 랑 tag 연결
+            if not ActivityParticipant.objects.filter(activity_id=activity_instance, user_id=user_instance):
+                ActivityParticipant(activity_id=activity_instance,
+                                    user_id=user_instance).save()  # activity 랑 작성자 연결
+            # 문제 발견, 태그 생성은 되는데 response 에 보이질 않음.
+            serializer = ActivitySerializer(activity_instance, context=context)
+            # 시리얼라이저를 재정의해서 데이터를 다시가져오는 것으로 해결.
+            addTagName(serializer.data, Tag)
+            #####end#####
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TagViewSet(viewsets.ModelViewSet):

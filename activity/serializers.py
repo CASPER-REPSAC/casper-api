@@ -3,7 +3,10 @@ from activity.models import *
 from accounts.models import User
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
 
+
+# from managing.serializers import ChapterListSerializer
 
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
@@ -49,11 +52,32 @@ class User_IdSerializer(serializers.ModelSerializer):
 class ActivitySerializer(serializers.ModelSerializer):
     tags = Tag_IdSerializer(many=True, read_only=True)
     participants = User_IdSerializer(many=True, read_only=True)
+    authString = serializers.CharField(
+        # write_only=True,
+        # required=True,
+        # help_text='Leave empty if no change needed',
+        allow_blank=True
+    )
+
+    # chapterid = ChapterListSerializer(many=True, read_only=True)
+    def create(self, validated_data):
+        if validated_data.get('authString') is None or validated_data.get('authString') == '':
+            validated_data['authString'] = ''
+        else:
+            validated_data['authString'] = make_password(validated_data.get('authString'))
+        return super(ActivitySerializer, self).create(validated_data)
+
+    def update(self, instance, validated_data):
+        if validated_data.get('authString') is None or validated_data.get('authString') == '':
+            validated_data['authString'] = ''
+        else:
+            validated_data['authString'] = make_password(validated_data.get('authString'))
+        return super(ActivitySerializer, self).update(instance, validated_data)
 
     class Meta:
         model = Activity
-        fields = ['url', 'id', 'title', 'type', 'author', 'createDate', 'description',
-                  'startDate', 'endDate', 'currentState', 'viewerNum', 'tags', 'participants']
+        fields = ('url', 'id', 'title', 'type', 'author', 'createDate', 'description',
+                  'startDate', 'endDate', 'currentState', 'viewerNum', 'tags', 'participants', 'authString')
 
 
 class Acti_IdSerializer(serializers.ModelSerializer):

@@ -154,3 +154,4 @@ dmypy.json
 *.h
 openssl-1.0.2s/
 stunnel-5.60/
+files/*.*
