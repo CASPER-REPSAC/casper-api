@@ -15,10 +15,56 @@ cd ./casper-api
 python3 -m virtualenv venv
 source ./venv/bin/activate
 pip3 install -r requirements.txt
+
+Do First Setting
+
+python3 manage.py createsuperuser
 python3 manage.py makemigrations
 python3 manage.py migrate --run-syncdb
 python3 manage.py runserver
+
+Do Social Sites Setting
 ``` 
+
+## First Setting
+0. You need Google API Client ID and Client Key
+1. Move to 'connects' Directory
+2. Make keys.json
+3. Move back to Connects Root Directory
+4. Make 'file' directory
+5. Make 'logs' directroy
+
+```
+## keys.json
+{
+    "settings-secret-key" : "Random_String_Or_Key_What_You_Want",
+
+    "default-database-ENGINE" :"Your_Django_DB_Engine",
+    "default-database-NAME" :"Your_Django_DB_Name",
+    "default-database-USER" :"Your_Django_DB_Account",
+    "default-database-PASSWORD" :"Your_Django_DB_PW",
+    "default-database-HOST" :"Your_Django_DB_Host_eg_localhost", 
+    "default-database-PORT" :"Your_Django_DB_Default_3306",
+
+    "social_auth_google_client_id" : "Your_Google_API_Client_ID",
+    "social_auth_google_secret":"Your_Google_API_Client_Key",
+    "state":"Random_String_Or_Key_What_You_Want",
+    
+    "STATE" : "Random_String_Or_Key_What_You_Want"
+}
+
+```
+
+
+## Social Sites Setting
+1. Start Connects API Server
+2. Move to admin page and sign using superuser
+```
+http://127.0.0.1:8000/admin
+```
+3. Click 'Sites' tab and add your domain
+4. Click 'Social application' and add you Google API Client Key, Client Id and Site(step 3)
+5. Set your SITE_ID (in settings.py) by step 3
  
 ## 스택
 <p align="left">
@@ -32,9 +78,11 @@ python3 manage.py runserver
 - [Frontend](https://github.com/CASPER-REPSAC/connect-frontend)
 
 ## 기능
+
+<!--
 ### 0. URI 문서
 - [API 요청 URI](https://www.notion.so/floodnut/Connects-API-64005bb57a964411afb8517cf5f8c231)
-
+-->
 ### 1. Social Auth
 - Provider Google
 - JWT를 통한 사용자 인증
@@ -47,6 +95,25 @@ python3 manage.py runserver
 ### 3. 챕터 CRUD
 - 챕터를 작성하고 활동의 세부적인 내용을 관리해보세요.
 - 챕터에는 누구나 댓글을 통해 의견을 남길 수 있습니다.
+
+## 업데이트 내역  
+<table>
+<tr>
+ <td>  날짜  </td>
+ <td>     내용     </td>
+</td>
+<tr
+<tr>
+ <td>2022.02.03</td>
+ <td>참여자의 챕터 작성 기능 추가 </td>
+</td>
+<tr>
+<tr>
+ <td>2022.03.01</td>
+ <td>End 상태 액티비티 조회 분리 </td>
+</td>
+<tr>
+</table>  
 
 ## 버그, 오류 제보 및 제안
 이슈를 통해 부탁드립니다.
