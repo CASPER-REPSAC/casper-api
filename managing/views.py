@@ -30,12 +30,23 @@ from activity.serializers import ActivitySerializer
 
 
 # # Activity
+@api_view(['GET'])
+def activity_end_list(request):
+    context = {'request': request}
+    if request.method == "GET":
+        activities = Activity.objects.filter(currentState=2)
+        serializer = ActivitySerializer(activities, many=True, context=context)
+        addTagName(serializer.data, Tag)
+        addUserName(serializer.data, UserReturn)
+        return Response(serializer.data)
+
+
 
 @api_view(['GET', 'POST'])
 def activity_list(request):
     context = {'request': request}
     if request.method == "GET":
-        activities = Activity.objects.all()
+        activities = Activity.objects.filter(Q(currentState=0)|Q(currentState=1))
         serializer = ActivitySerializer(activities, many=True, context=context)
         addTagName(serializer.data, Tag)
         addUserName(serializer.data, UserReturn)
@@ -47,17 +58,17 @@ def activity_list(request):
             token = JWTValidation(request.META['HTTP_AUTHORIZATION'].split()[1])
             authed = token.decode_jwt()
             user_instance = User.objects.get(id=authed['user_id'])
-            print(1)
+            #print(1)
         except:
-            print(2)
+            #print(2)
             return Response('auth_error', status=status.HTTP_400_BAD_REQUEST)
 
         serializer = ActivitySerializer(data=request.data, partial=True, context=context)
         if serializer.is_valid(): # raise_exception=True):
-            print(3)
+            #print(3)
             serializer.save(author=user_instance,
                             title=escape(request.data['title']))  # , description = escape(request.data['description']))
-            print(4)
+            #print(4)
             if 'tags' in request.data:
                 activity_instance = Activity.objects.get(pk=serializer.data['id'])  # 방금 생성된 activity_instance 가져옴
                 req_tags = request.data['tags']  # post 로 입력받은 태그 리스트
@@ -73,15 +84,14 @@ def activity_list(request):
                 # 시리얼라이저를 재정의해서 데이터를 다시가져오는 것으로 해결.
                 addTagName(serializer.data, Tag)
                 addUserName(serializer.data, UserReturn)
-            print(5)
+            #print(5)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        print(6)
+        #print(6)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 ## Activity update
 ## Chapter Write
-# @csrf_exempt
 @api_view(['GET', 'POST', 'PATCH', 'DELETE'])
 def activity_detail(request, pk):
     context = {'request': request}
@@ -227,7 +237,6 @@ def activity_detail(request, pk):
 
 
 ## Chapter update
-# @csrf_exempt
 @api_view(['POST'])
 def chapter_update(request, pk, chapterid):
     try:
@@ -236,10 +245,7 @@ def chapter_update(request, pk, chapterid):
 
         acti = Activity.objects.get(id=pk)
         user = User.objects.get(id=authed['user_id'])
-        # print(acti.author)
-        # print(len(acti.author))
-        # print(user.email)
-        # print(len(user.email))
+
 
         if (acti.author).strip() != (user.email).strip():
             # print('chapter_up')

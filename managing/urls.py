@@ -5,9 +5,11 @@ from accounts.views import *
 
 urlpatterns = [
     path('', activity_list),
+    path('end/', activity_end_list),
     path('<int:pk>', activity_detail),
     path('<int:pk>/', activity_detail),
 
+    
     # UPDATE uri
     path('<int:pk>/chapter/<int:chapterid>/update_chapter', chapter_update),
     path('<int:pk>/chapter/<int:chapterid>/update_chapter/', chapter_update),
