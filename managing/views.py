@@ -1,6 +1,7 @@
 # from _typeshed import FileDescriptorLike
 import datetime
 import os
+from platform import platform
 import re
 import uuid
 import json
@@ -30,12 +31,23 @@ from activity.serializers import ActivitySerializer
 
 
 # # Activity
+@api_view(['GET'])
+def activity_end_list(request):
+    context = {'request': request}
+    if request.method == "GET":
+        activities = Activity.objects.filter(currentState=2)
+        serializer = ActivitySerializer(activities, many=True, context=context)
+        addTagName(serializer.data, Tag)
+        addUserName(serializer.data, UserReturn)
+        return Response(serializer.data)
+
+
 
 @api_view(['GET', 'POST'])
 def activity_list(request):
     context = {'request': request}
     if request.method == "GET":
-        activities = Activity.objects.all()
+        activities = Activity.objects.filter(Q(currentState=0)|Q(currentState=1))
         serializer = ActivitySerializer(activities, many=True, context=context)
         addTagName(serializer.data, Tag)
         addUserName(serializer.data, UserReturn)
@@ -47,17 +59,17 @@ def activity_list(request):
             token = JWTValidation(request.META['HTTP_AUTHORIZATION'].split()[1])
             authed = token.decode_jwt()
             user_instance = User.objects.get(id=authed['user_id'])
-            print(1)
+            #print(1)
         except:
-            print(2)
+            #print(2)
             return Response('auth_error', status=status.HTTP_400_BAD_REQUEST)
 
         serializer = ActivitySerializer(data=request.data, partial=True, context=context)
         if serializer.is_valid(): # raise_exception=True):
-            print(3)
+            #print(3)
             serializer.save(author=user_instance,
                             title=escape(request.data['title']))  # , description = escape(request.data['description']))
-            print(4)
+            #print(4)
             if 'tags' in request.data:
                 activity_instance = Activity.objects.get(pk=serializer.data['id'])  # 방금 생성된 activity_instance 가져옴
                 req_tags = request.data['tags']  # post 로 입력받은 태그 리스트
@@ -73,15 +85,14 @@ def activity_list(request):
                 # 시리얼라이저를 재정의해서 데이터를 다시가져오는 것으로 해결.
                 addTagName(serializer.data, Tag)
                 addUserName(serializer.data, UserReturn)
-            print(5)
+            #print(5)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        print(6)
+        #print(6)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 ## Activity update
 ## Chapter Write
-# @csrf_exempt
 @api_view(['GET', 'POST', 'PATCH', 'DELETE'])
 def activity_detail(request, pk):
     context = {'request': request}
@@ -227,7 +238,6 @@ def activity_detail(request, pk):
 
 
 ## Chapter update
-# @csrf_exempt
 @api_view(['POST'])
 def chapter_update(request, pk, chapterid):
     try:
@@ -236,10 +246,7 @@ def chapter_update(request, pk, chapterid):
 
         acti = Activity.objects.get(id=pk)
         user = User.objects.get(id=authed['user_id'])
-        # print(acti.author)
-        # print(len(acti.author))
-        # print(user.email)
-        # print(len(user.email))
+
 
         if (acti.author).strip() != (user.email).strip():
             # print('chapter_up')
@@ -587,7 +594,7 @@ def delete_comment(request, commentpk):
 def search_all(request):
     try:
         keyword = request.GET.get('keyword', '')
-        acti = Activity.objects.filter(Q(title__icontains=keyword) | Q(description__icontains=keyword)).distinct()
+        acti = Activity.objects.filter((Q(currentState=0)|Q(currentState=1)) & (Q(title__icontains=keyword) | Q(description__icontains=keyword))).distinct()
         chapter = Chapter.objects.filter(Q(article__icontains=keyword) | Q(subject__icontains=keyword)).distinct()
 
         acti_serializer = ActivitySerializer(acti, many=True, context={'request': request})
@@ -625,6 +632,51 @@ def search_all(request):
         return Response({"error": "Input Value must be an integer"}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def search_user(request):
+    try:
+        token = JWTValidation(request.META['HTTP_AUTHORIZATION'].split()[1])
+        authed = token.decode_jwt()
+    except:
+        return Response('auth_error', status=status.HTTP_400_BAD_REQUEST)
+
+    if not authed:
+        return Response(authed, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        email = request.GET.get('user')
+        acti = Activity.objects.filter(author=email).distinct()
+        acti_serializer = ActivitySerializer(acti, many=True, context={'request': request})
+
+        addTagName(acti_serializer.data, Tag)
+        addUserName(acti_serializer.data, User)
+
+        search_type = 'activity'
+        search = acti_serializer.data
+
+        # get query 로 페이지 번호와 페이지 크기를 입력받음
+        page_size = int(request.GET.get('page_size', 10))
+        page_number = int(request.GET.get('page_number', 1))
+
+        paginator = Paginator(search, page_size)
+        paginated_search = paginator.page(page_number).object_list
+        ret = {"searched_objects_count": paginator.count,
+               "page_size": page_size,  # 페이지 사이즈
+               "page_index": page_number,  # 현재 페이지 번호
+               "page_end_index": paginator.num_pages,  # 페이지 끝 번호
+               "search_type": search_type,  # 검색 유형
+               "searched_objects": paginated_search  # 검색 결과들
+               }
+        # 이게 더 간단함. 물론 이렇게 쓰는건 아닌 것 같지만, 일단 원하는 대로 작동은 함
+        return Response(ret, status=status.HTTP_200_OK)
+    except EmptyPage as e:
+        return Response({"error": e.args[0]}, status=status.HTTP_400_BAD_REQUEST)
+    except ValueError:
+        return Response({"error": "Input Value must be an integer"}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class ActivityViewSet(viewsets.ModelViewSet):

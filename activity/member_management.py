@@ -9,6 +9,7 @@ from connects.middleware import JWTValidation
 from connects.utils import addTagName, addUserName
 from managing.models import Activity
 
+from django.db.models import Q
 
 @api_view(['POST'])
 def member(request, pk):
@@ -91,7 +92,7 @@ def containedActivity_new(request):
     # user_instance = User.objects.get(id=request.data['user_id'])
 
     #start = time.time()
-    actiparti_instances = ActivityParticipant.objects.filter(user_id=user_instance).only('activity_id')
+    actiparti_instances = ActivityParticipant.objects.filter( ( Q(currentState=0) | Q(currentState=1) )&Q(  user_id=user_instance)).only('activity_id')
     activities_instances = [_act_pt.activity_id for _act_pt in actiparti_instances]
     serializer = ActivitySerializer(activities_instances, many=True, context=context)
     #print(serializer.data)

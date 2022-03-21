@@ -7,7 +7,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 from django.views.generic import RedirectView
-from managing.views import search_all
+from managing.views import search_all, search_user
 from activity.member_management import ownActivity, containedActivity_new,  containedActivity
 
 
@@ -67,6 +67,7 @@ urlpatterns = [
 
     # Search
     path('api/search/', search_all),
+    path('api/search_user',search_user),
 
     # Activity
     path('api/w00/', include('activity.urls')),
