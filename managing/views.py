@@ -1,6 +1,7 @@
 # from _typeshed import FileDescriptorLike
 import datetime
 import os
+from platform import platform
 import re
 import uuid
 import json
@@ -593,7 +594,7 @@ def delete_comment(request, commentpk):
 def search_all(request):
     try:
         keyword = request.GET.get('keyword', '')
-        acti = Activity.objects.filter(Q(title__icontains=keyword) | Q(description__icontains=keyword)).distinct()
+        acti = Activity.objects.filter((Q(currentState=0)|Q(currentState=1)) & (Q(title__icontains=keyword) | Q(description__icontains=keyword))).distinct()
         chapter = Chapter.objects.filter(Q(article__icontains=keyword) | Q(subject__icontains=keyword)).distinct()
 
         acti_serializer = ActivitySerializer(acti, many=True, context={'request': request})
@@ -631,6 +632,51 @@ def search_all(request):
         return Response({"error": "Input Value must be an integer"}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def search_user(request):
+    try:
+        token = JWTValidation(request.META['HTTP_AUTHORIZATION'].split()[1])
+        authed = token.decode_jwt()
+    except:
+        return Response('auth_error', status=status.HTTP_400_BAD_REQUEST)
+
+    if not authed:
+        return Response(authed, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        email = request.GET.get('user')
+        acti = Activity.objects.filter(author=email).distinct()
+        acti_serializer = ActivitySerializer(acti, many=True, context={'request': request})
+
+        addTagName(acti_serializer.data, Tag)
+        addUserName(acti_serializer.data, User)
+
+        search_type = 'activity'
+        search = acti_serializer.data
+
+        # get query 로 페이지 번호와 페이지 크기를 입력받음
+        page_size = int(request.GET.get('page_size', 10))
+        page_number = int(request.GET.get('page_number', 1))
+
+        paginator = Paginator(search, page_size)
+        paginated_search = paginator.page(page_number).object_list
+        ret = {"searched_objects_count": paginator.count,
+               "page_size": page_size,  # 페이지 사이즈
+               "page_index": page_number,  # 현재 페이지 번호
+               "page_end_index": paginator.num_pages,  # 페이지 끝 번호
+               "search_type": search_type,  # 검색 유형
+               "searched_objects": paginated_search  # 검색 결과들
+               }
+        # 이게 더 간단함. 물론 이렇게 쓰는건 아닌 것 같지만, 일단 원하는 대로 작동은 함
+        return Response(ret, status=status.HTTP_200_OK)
+    except EmptyPage as e:
+        return Response({"error": e.args[0]}, status=status.HTTP_400_BAD_REQUEST)
+    except ValueError:
+        return Response({"error": "Input Value must be an integer"}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class ActivityViewSet(viewsets.ModelViewSet):
