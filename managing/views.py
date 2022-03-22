@@ -638,16 +638,22 @@ def search_user(request):
     try:
         token = JWTValidation(request.META['HTTP_AUTHORIZATION'].split()[1])
         authed = token.decode_jwt()
+        if not authed:
+            return Response(authed, status=status.HTTP_400_BAD_REQUEST)
     except:
         return Response('auth_error', status=status.HTTP_400_BAD_REQUEST)
-
-    if not authed:
-        return Response(authed, status=status.HTTP_400_BAD_REQUEST)
 
     try:
         email = request.GET.get('user')
         acti = Activity.objects.filter(author=email).distinct()
         acti_serializer = ActivitySerializer(acti, many=True, context={'request': request})
+        uid = User.objects.get(email = email)
+        _json = json.loads(str(SocialUser.objects.get(user=uid).extra_data))
+        _json.pop('verified_email')
+        _json.pop('id')
+        _json.pop('locale')
+        _json.pop('given_name')
+        _json.pop('family_name')
 
         addTagName(acti_serializer.data, Tag)
         addUserName(acti_serializer.data, User)
@@ -666,6 +672,7 @@ def search_user(request):
                "page_index": page_number,  # 현재 페이지 번호
                "page_end_index": paginator.num_pages,  # 페이지 끝 번호
                "search_type": search_type,  # 검색 유형
+               "user_info" : _json, # 유저정보 
                "searched_objects": paginated_search  # 검색 결과들
                }
         # 이게 더 간단함. 물론 이렇게 쓰는건 아닌 것 같지만, 일단 원하는 대로 작동은 함
